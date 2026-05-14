@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Power Actors & Relationships — Civic Power Lab</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=Work+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #efe6d1;
+    --paper-tint: #f5eedb;
+    --cream-2: #e6dcc2;
+    --rule: #cec2a8;
+    --rule-soft: #ddd2b6;
+    --ink: #171514;
+    --ink-2: #332f2b;
+    --mute: #6a6256;
+    --cobalt: #13306b;
+    --cobalt-deep: #0a204e;
+    --cobalt-soft: #4a6396;
+    --terracotta: #b7432b;
+    --terracotta-soft: #d2735d;
+    --olive: #6b7a3a;
+    --amber: #c89342;
+    --slate: #4a5566;
+    --serif: "Source Serif 4", Georgia, serif;
+    --sans: "Work Sans", -apple-system, system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: var(--sans);
+    font-weight: 300;
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ===== App shell ===== */
+  .app { display: flex; flex-direction: column; height: 100vh; }
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper);
+  }
+  .wordmark {
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--cobalt);
+  }
+  .wordmark .dot { color: var(--terracotta); margin: 0 6px; }
+  .title-block { display: flex; align-items: baseline; gap: 14px; }
+  .title-block h1 {
+    font-family: var(--serif); font-weight: 400; font-size: 20px;
+    margin: 0; color: var(--ink);
+  }
+  .title-block .sub {
+    font-family: var(--mono); font-size: 10px; color: var(--mute);
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .badge {
+    font-family: var(--mono); font-size: 10px; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--terracotta); color: var(--paper);
+    padding: 4px 8px; border-radius: 2px;
+  }
+  .top-actions { display: flex; gap: 8px; }
+
+  /* ===== Layout ===== */
+  .pane-wrap { flex: 1; display: grid; grid-template-columns: minmax(380px, 460px) 1fr; min-height: 0; }
+  .left-pane { border-right: 1px solid var(--rule); overflow-y: auto; background: var(--paper-tint); }
+  .right-pane { position: relative; overflow: hidden; background: var(--paper); }
+
+  /* ===== Sections ===== */
+  .section { border-bottom: 1px solid var(--rule-soft); }
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; cursor: pointer; user-select: none;
+  }
+  .section-header h2 {
+    margin: 0;
+    font-family: var(--mono); font-size: 10px; font-weight: 500;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--cobalt);
+  }
+  .section-header .caret { font-family: var(--mono); font-size: 11px; color: var(--mute); }
+  .section-body { padding: 0 20px 20px; }
+  .section-body p.intro {
+    font-family: var(--serif); font-size: 13px; line-height: 1.55; color: var(--ink-2);
+    margin: 0 0 14px;
+  }
+
+  /* ===== Form ===== */
+  .field { margin-bottom: 12px; }
+  .field label {
+    display: block;
+    font-family: var(--mono); font-size: 9.5px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--mute);
+    margin-bottom: 4px;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 7px 9px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    font-family: var(--sans); font-size: 13px; color: var(--ink);
+    border-radius: 2px;
+    transition: border-color 0.15s;
+  }
+  .field textarea { resize: vertical; min-height: 50px; font-family: var(--sans); }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--cobalt);
+    box-shadow: 0 0 0 1px var(--cobalt);
+  }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Face checkboxes */
+  .faces-grid { display: flex; flex-direction: column; gap: 6px; }
+  .face-row {
+    display: flex; align-items: flex-start; gap: 9px;
+    padding: 8px 10px;
+    border: 1px solid var(--rule); border-radius: 2px;
+    background: var(--paper); cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .face-row:hover { border-color: var(--cobalt-soft); }
+  .face-row.selected { background: #e9e0ca; border-color: var(--cobalt); }
+  .face-row.zero.selected { background: #f0d9d2; border-color: var(--terracotta); }
+  .face-row input { margin: 3px 0 0; accent-color: var(--cobalt); flex-shrink: 0; }
+  .face-row .face-num {
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    color: var(--cobalt); width: 14px; flex-shrink: 0;
+  }
+  .face-row.zero .face-num { color: var(--terracotta); }
+  .face-row .face-text { flex: 1; }
+  .face-row .face-label {
+    font-family: var(--sans); font-weight: 400; font-size: 13px; color: var(--ink);
+  }
+  .face-row .face-desc {
+    font-family: var(--sans); font-weight: 300; font-size: 12px; line-height: 1.45;
+    color: var(--mute); margin-top: 3px;
+  }
+
+  /* Buttons */
+  .btn {
+    font-family: var(--mono); font-size: 10px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 7px 14px; border-radius: 2px; cursor: pointer; border: 1px solid;
+    transition: background 0.15s, color 0.15s;
+  }
+  .btn-primary { background: var(--cobalt); color: var(--paper); border-color: var(--cobalt); }
+  .btn-primary:hover { background: var(--cobalt-deep); border-color: var(--cobalt-deep); }
+  .btn-ghost { background: transparent; color: var(--cobalt); border-color: var(--rule); }
+  .btn-ghost:hover { background: var(--cream-2); border-color: var(--cobalt); }
+  .btn-danger { background: transparent; color: var(--terracotta); border-color: var(--terracotta); }
+  .btn-danger:hover { background: var(--terracotta); color: var(--paper); }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 14px; }
+
+  /* ===== Actor list ===== */
+  .actor-list { display: flex; flex-direction: column; gap: 8px; }
+  .actor-card {
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    border-radius: 2px;
+    padding: 11px 13px;
+    transition: border-color 0.15s;
+  }
+  .actor-card:hover { border-color: var(--cobalt-soft); }
+  .actor-card.editing { border-color: var(--cobalt); }
+  .actor-card-head {
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .actor-color-chip {
+    width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.15);
+  }
+  .actor-summary { flex: 1; min-width: 0; }
+  .actor-name {
+    font-family: var(--serif); font-size: 14px; font-weight: 500;
+    color: var(--ink); line-height: 1.2;
+  }
+  .actor-meta {
+    font-family: var(--sans); font-size: 11.5px; color: var(--mute);
+    margin-top: 2px;
+  }
+  .actor-faces {
+    font-family: var(--mono); font-size: 9.5px; font-weight: 500;
+    color: var(--cobalt); letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+  .actor-faces.zero { color: var(--terracotta); }
+  .actor-actions {
+    display: flex; gap: 6px;
+  }
+  .icon-btn {
+    background: transparent; border: none; cursor: pointer;
+    color: var(--mute); font-family: var(--mono); font-size: 10px;
+    padding: 2px 4px; letter-spacing: 0.1em;
+  }
+  .icon-btn:hover { color: var(--cobalt); }
+  .icon-btn.delete:hover { color: var(--terracotta); }
+  .actor-edit-body { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--rule); }
+
+  /* ===== Map ===== */
+  .map-svg { width: 100%; height: 100%; display: block; }
+  .legend {
+    position: absolute; top: 18px; right: 18px;
+    background: rgba(245, 238, 219, 0.96);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 14px 16px;
+    max-width: 240px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .legend h3 {
+    margin: 0 0 8px;
+    font-family: var(--mono); font-size: 9.5px; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--cobalt);
+  }
+  .legend h3:not(:first-child) { margin-top: 12px; }
+  .legend .item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11.5px; color: var(--ink-2);
+    padding: 2px 0;
+  }
+  .legend .swatch { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .legend .size-swatch { background: var(--cobalt); }
+  .legend .edge-swatch { width: 24px; height: 0; flex-shrink: 0; }
+
+  /* Tooltip */
+  .map-tooltip {
+    position: absolute;
+    background: var(--ink); color: var(--paper);
+    padding: 8px 11px; border-radius: 2px;
+    pointer-events: none;
+    font-size: 11.5px; line-height: 1.4;
+    max-width: 260px;
+    z-index: 10;
+    transition: opacity 0.1s;
+  }
+  .map-tooltip .tt-name { font-family: var(--serif); font-size: 13px; font-weight: 500; }
+  .map-tooltip .tt-meta { font-size: 10.5px; color: rgba(239,230,209,0.7); margin-top: 2px; }
+  .map-tooltip .tt-faces { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; margin-top: 5px; color: rgba(239,230,209,0.85); }
+
+  /* SVG defaults */
+  .node-circle { cursor: pointer; transition: stroke-width 0.15s; }
+  .node-label {
+    font-family: var(--sans); font-size: 10.5px; font-weight: 400;
+    fill: var(--ink); pointer-events: none;
+    paint-order: stroke; stroke: rgba(239,230,209,0.85); stroke-width: 3px;
+  }
+  .node-label.ego { font-size: 12.5px; font-weight: 500; }
+
+  /* ===== Tabs ===== */
+  .tabs {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+    display: flex; gap: 0;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+    padding: 0 20px;
+  }
+  .tab {
+    font-family: var(--mono); font-size: 10px; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--mute);
+    padding: 14px 18px;
+    background: transparent; border: none; cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .tab:hover { color: var(--ink-2); }
+  .tab.active { color: var(--cobalt); border-bottom-color: var(--cobalt); }
+  .view-host {
+    position: absolute; top: 41px; left: 0; right: 0; bottom: 0;
+  }
+
+  /* ===== Power grid ===== */
+  .grid-stage {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    padding: 30px;
+  }
+  .grid-svg { max-width: 100%; max-height: 100%; cursor: default; }
+  .grid-quad-label {
+    font-family: var(--mono); font-size: 9.5px; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase; fill: var(--mute);
+  }
+  .grid-quad-strategy {
+    font-family: var(--serif); font-size: 12px; font-style: italic;
+    fill: var(--ink-2);
+  }
+  .grid-axis-label {
+    font-family: var(--mono); font-size: 10px; font-weight: 500;
+    letter-spacing: 0.16em; text-transform: uppercase; fill: var(--cobalt);
+  }
+  .grid-dot { cursor: grab; }
+  .grid-dot.dragging { cursor: grabbing; }
+
+  /* ===== Mini grid picker (in form) ===== */
+  .mini-grid-wrap {
+    display: grid;
+    grid-template-columns: 56px 1fr 56px;
+    grid-template-rows: 18px 1fr 18px;
+    gap: 4px;
+    max-width: 280px;
+    margin: 6px 0 6px;
+  }
+  .mini-grid-axis-lbl {
+    font-family: var(--mono); font-size: 9px; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--mute);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mini-grid-axis-lbl.left { justify-content: flex-end; padding-right: 4px; }
+  .mini-grid-axis-lbl.right { justify-content: flex-start; padding-left: 4px; }
+  .mini-grid {
+    grid-column: 2; grid-row: 2;
+    aspect-ratio: 1 / 1;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    position: relative; cursor: crosshair;
+  }
+  .mini-grid-axes { position: absolute; inset: 0; }
+  .mini-grid-axes::before, .mini-grid-axes::after {
+    content: ""; position: absolute; background: var(--rule);
+  }
+  .mini-grid-axes::before { left: 0; right: 0; top: 50%; height: 1px; }
+  .mini-grid-axes::after { top: 0; bottom: 0; left: 50%; width: 1px; }
+  .mini-grid-dot {
+    position: absolute;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid var(--paper);
+    box-shadow: 0 0 0 1px var(--ink);
+    pointer-events: none;
+  }
+  .grid-coord-readout {
+    font-family: var(--mono); font-size: 10px; color: var(--mute);
+    letter-spacing: 0.05em;
+  }
+
+  /* Empty hint */
+  .empty {
+    text-align: center; padding: 40px 20px;
+    color: var(--mute); font-family: var(--serif); font-size: 13px;
+  }
+
+  /* Helpers */
+  .stack > * + * { margin-top: 8px; }
+  .note-line {
+    font-family: var(--serif); font-size: 12px; color: var(--mute); line-height: 1.45;
+    margin-top: 4px; font-style: italic;
+  }
+  .footer-hint {
+    font-family: var(--mono); font-size: 9.5px; color: var(--mute);
+    letter-spacing: 0.1em; padding: 14px 20px 24px;
+  }
+
+  /* Scrollbar */
+  .left-pane::-webkit-scrollbar { width: 8px; }
+  .left-pane::-webkit-scrollbar-track { background: transparent; }
+  .left-pane::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+  .left-pane::-webkit-scrollbar-thumb:hover { background: var(--mute); }
+</style>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/d3@7/dist/d3.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+/* ========= Static config ========= */
+
+const ACTOR_TYPES = [
+  { value: "elected",     label: "Elected official",                  color: "#13306b" },
+  { value: "gov_staff",   label: "Government staff",                  color: "#6b7a3a" },
+  { value: "base_org",    label: "Base-building org leader",          color: "#b7432b" },
+  { value: "advocacy",    label: "Advocacy org leader",               color: "#c89342" },
+  { value: "operative",   label: "Other influential leader / operative", color: "#4a5566" },
+];
+
+const CONSTITUENCY = [
+  { value: "individual", label: "Individual",          radius: 12 },
+  { value: "organized",  label: "Organized base",      radius: 18 },
+  { value: "mass",       label: "Mass constituency",   radius: 26 },
+];
+
+const FACES = [
+  {
+    value: 0,
+    label: "No power relationship",
+    desc: "You may not know this person, or you know them only socially or professionally — not in the context of building or contesting political power."
+  },
+  {
+    value: 1,
+    label: "Decision-making power",
+    desc: "Engaging around specific policy, programmatic, or campaign goals — working to determine the outcome of a contested decision."
+  },
+  {
+    value: 2,
+    label: "Agenda power",
+    desc: "Shaping what issues and solutions are on the agenda, who has a seat at the table, and how decisions are made."
+  },
+  {
+    value: 3,
+    label: "Ideological power",
+    desc: "Reshaping how issues, constituencies, and solutions are understood — shifting narratives about what is just, legitimate, and possible."
+  }
+];
+
+const EDGE_STYLE = {
+  0: { stroke: "#a59a82", width: 1.0, dash: "3 4", opacity: 0.5 },
+  1: { stroke: "#4a6396", width: 1.5, dash: null,  opacity: 0.85 },
+  2: { stroke: "#13306b", width: 2.8, dash: null,  opacity: 0.9 },
+  3: { stroke: "#b7432b", width: 4.5, dash: null,  opacity: 0.95 },
+};
+
+const lookupType = v => ACTOR_TYPES.find(t => t.value === v) || ACTOR_TYPES[0];
+const lookupConst = v => CONSTITUENCY.find(c => c.value === v) || CONSTITUENCY[1];
+const highestFace = faces => {
+  if (!faces || faces.length === 0) return 0;
+  if (faces.includes(0) && faces.length === 1) return 0;
+  return Math.max(...faces.filter(f => f > 0));
+};
+
+/* ========= Seed data ========= */
+
+const SEED_ORG = {
+  orgName: "Mid-South Community Power",
+  date: "2026-05-14",
+  participants: "Director, Lead Organizer, Policy Director"
+};
+
+const seedActors = () => ([
+  {
+    id: "a1",
+    name: "Rep. Marcus Holloway",
+    title: "State Representative, District 14",
+    organization: "State Legislature",
+    actorType: "elected",
+    constituency: "mass",
+    faces: [1, 2],
+    whyMatter: "Lead sponsor on the housing trust fund bill; key swing vote on budget.",
+    notes: "Regular strategy calls during session. Co-developed last year's amendment package.",
+    gridX: 0.55, gridY: 0.55
+  },
+  {
+    id: "a2",
+    name: "Janelle Park",
+    title: "Director, Workforce Investment Division",
+    organization: "State Dept. of Economic Development",
+    actorType: "gov_staff",
+    constituency: "organized",
+    faces: [1],
+    whyMatter: "Controls implementation of the workforce equity rule we won in 2024.",
+    notes: "Quarterly check-ins. Relationship is transactional but reliable.",
+    gridX: 0.2, gridY: 0.4
+  },
+  {
+    id: "a3",
+    name: "Rev. Tomás Aguilar",
+    title: "Executive Director",
+    organization: "Faith United Coalition",
+    actorType: "base_org",
+    constituency: "mass",
+    faces: [1, 2, 3],
+    whyMatter: "Anchor partner for the moral economy frame and door-to-door capacity.",
+    notes: "Deepest peer alliance. Joint canvasses, shared narrative work, co-led last cycle's listening campaign.",
+    gridX: 0.8, gridY: 0.45
+  },
+  {
+    id: "a4",
+    name: "Priya Mehrotra",
+    title: "Campaigns Director",
+    organization: "Statewide Advocacy Network",
+    actorType: "advocacy",
+    constituency: "organized",
+    faces: [2, 3],
+    whyMatter: "Convenes the statewide coalition table; controls comms war room.",
+    notes: "Strategic alignment is strong. Less involved in our direct base work.",
+    gridX: 0.6, gridY: 0.35
+  },
+  {
+    id: "a5",
+    name: "Kareem Walsh",
+    title: "Independent Political Consultant",
+    organization: "(Solo)",
+    actorType: "operative",
+    constituency: "individual",
+    faces: [2],
+    whyMatter: "Connects us to caucus leadership; reads the legislative weather.",
+    notes: "Informal, ad-hoc. Useful for intel and access, not for strategy.",
+    gridX: 0.25, gridY: -0.2
+  },
+  {
+    id: "a6",
+    name: "Sen. Rebecca Mahler",
+    title: "State Senator, Appropriations Chair",
+    organization: "State Senate",
+    actorType: "elected",
+    constituency: "mass",
+    faces: [1],
+    whyMatter: "Chairs the committee where our budget asks live. Holds them up every cycle.",
+    notes: "Hostile but reachable. Met twice last year — formal, transactional.",
+    gridX: -0.65, gridY: 0.75
+  }
+]);
+
+/* ========= Faces multi-select ========= */
+
+function FaceSelect({ value, onChange }) {
+  const toggle = (n) => {
+    let next;
+    if (n === 0) {
+      next = value.includes(0) ? [] : [0];
+    } else {
+      const without = value.filter(v => v !== 0);
+      next = without.includes(n) ? without.filter(v => v !== n) : [...without, n].sort();
+    }
+    onChange(next);
+  };
+  return (
+    <div className="faces-grid">
+      {FACES.map(f => {
+        const selected = value.includes(f.value);
+        return (
+          <label key={f.value} className={"face-row" + (selected ? " selected" : "") + (f.value === 0 ? " zero" : "")}>
+            <input type="checkbox" checked={selected} onChange={() => toggle(f.value)} />
+            <span className="face-num">{f.value}</span>
+            <span className="face-text">
+              <span className="face-label">{f.label}</span>
+              <span className="face-desc">{f.desc}</span>
+            </span>
+          </label>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ========= Actor form (used for new + edit) ========= */
+
+function MiniGridPicker({ x, y, color, onChange }) {
+  const ref = useRef(null);
+  const dragging = useRef(false);
+  const update = (e) => {
+    const r = ref.current.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    const nx = Math.max(-1, Math.min(1, px * 2 - 1));
+    const ny = Math.max(-1, Math.min(1, (1 - py) * 2 - 1));
+    onChange(Number(nx.toFixed(2)), Number(ny.toFixed(2)));
+  };
+  const onDown = (e) => { dragging.current = true; update(e); e.preventDefault(); };
+  const onMove = (e) => { if (dragging.current) update(e); };
+  const onUp = () => { dragging.current = false; };
+  useEffect(() => {
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, []);
+  const leftPct = ((x + 1) / 2) * 100;
+  const topPct = ((1 - y) / 2) * 100;
+  const supportTxt = x === 0 ? "Neutral" : (x > 0 ? "Supporter +" : "Opponent ") + Math.abs(x).toFixed(2);
+  const powerTxt = y === 0 ? "Mid-power" : (y > 0 ? "Powerful +" : "Not powerful ") + Math.abs(y).toFixed(2);
+  return (
+    <div>
+      <div className="mini-grid-wrap">
+        <div></div>
+        <div className="mini-grid-axis-lbl">Powerful</div>
+        <div></div>
+        <div className="mini-grid-axis-lbl left">Opponent</div>
+        <div ref={ref} className="mini-grid" onMouseDown={onDown}>
+          <div className="mini-grid-axes"></div>
+          <div className="mini-grid-dot" style={{ left: leftPct + "%", top: topPct + "%", background: color }}></div>
+        </div>
+        <div className="mini-grid-axis-lbl right">Supporter</div>
+        <div></div>
+        <div className="mini-grid-axis-lbl">Not powerful</div>
+        <div></div>
+      </div>
+      <div className="grid-coord-readout">{supportTxt} · {powerTxt}</div>
+    </div>
+  );
+}
+
+function ActorForm({ initial, onCommit, onCancel, submitLabel }) {
+  const blank = {
+    name: "", title: "", organization: "",
+    actorType: "elected", constituency: "organized",
+    faces: [], whyMatter: "", notes: "",
+    gridX: 0, gridY: 0
+  };
+  const [draft, setDraft] = useState(initial || blank);
+  const set = (k, v) => setDraft(d => ({ ...d, [k]: v }));
+
+  // Live-commit if editing (onCommit provided continuously)
+  const isEditing = !!initial && !!onCancel;
+  useEffect(() => {
+    if (isEditing) onCommit(draft);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft]);
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!draft.name.trim()) return;
+    onCommit(draft);
+    if (!isEditing) setDraft(blank);
+  };
+
+  return (
+    <form onSubmit={submit}>
+      <div className="field">
+        <label>Name</label>
+        <input value={draft.name} onChange={e => set("name", e.target.value)} placeholder="e.g., Sen. Maria Chen" />
+      </div>
+      <div className="field-row">
+        <div className="field">
+          <label>Title</label>
+          <input value={draft.title} onChange={e => set("title", e.target.value)} placeholder="Role / position" />
+        </div>
+        <div className="field">
+          <label>Organization</label>
+          <input value={draft.organization} onChange={e => set("organization", e.target.value)} placeholder="Institution" />
+        </div>
+      </div>
+      <div className="field-row">
+        <div className="field">
+          <label>Actor type</label>
+          <select value={draft.actorType} onChange={e => set("actorType", e.target.value)}>
+            {ACTOR_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+          </select>
+        </div>
+        <div className="field">
+          <label>Constituency size</label>
+          <select value={draft.constituency} onChange={e => set("constituency", e.target.value)}>
+            {CONSTITUENCY.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="field">
+        <label>Faces of power engaged</label>
+        <FaceSelect value={draft.faces} onChange={v => set("faces", v)} />
+      </div>
+      <div className="field">
+        <label>Position on the power grid</label>
+        <MiniGridPicker
+          x={draft.gridX ?? 0}
+          y={draft.gridY ?? 0}
+          color={lookupType(draft.actorType).color}
+          onChange={(nx, ny) => setDraft(d => ({ ...d, gridX: nx, gridY: ny }))}
+        />
+      </div>
+      <div className="field">
+        <label>Why this actor matters</label>
+        <textarea value={draft.whyMatter} onChange={e => set("whyMatter", e.target.value)} placeholder="What role do they play in your power landscape?" />
+      </div>
+      <div className="field">
+        <label>Notes on relationship</label>
+        <textarea value={draft.notes} onChange={e => set("notes", e.target.value)} placeholder="What actually happens when you interact?" />
+      </div>
+      {!isEditing ? (
+        <div className="btn-row">
+          <button type="submit" className="btn btn-primary">Add actor</button>
+        </div>
+      ) : (
+        <div className="btn-row">
+          <button type="button" className="btn btn-ghost" onClick={onCancel}>Done editing</button>
+        </div>
+      )}
+    </form>
+  );
+}
+
+/* ========= Actor list item ========= */
+
+function ActorCard({ actor, onUpdate, onDelete }) {
+  const [editing, setEditing] = useState(false);
+  const t = lookupType(actor.actorType);
+  const hf = highestFace(actor.faces);
+  const facesStr = (!actor.faces || actor.faces.length === 0) ? "— faces unset" :
+                   actor.faces.includes(0) ? "Face 0" :
+                   "Faces " + actor.faces.join(", ");
+  return (
+    <div className={"actor-card" + (editing ? " editing" : "")}>
+      <div className="actor-card-head">
+        <span className="actor-color-chip" style={{ background: t.color }}></span>
+        <div className="actor-summary">
+          <div className="actor-name">{actor.name || <span style={{color:"var(--mute)", fontStyle:"italic"}}>Unnamed actor</span>}</div>
+          <div className="actor-meta">
+            {[actor.title, actor.organization].filter(Boolean).join(" · ") || <span style={{fontStyle:"italic"}}>no title / org</span>}
+          </div>
+          <div className={"actor-faces" + (hf === 0 ? " zero" : "")}>{facesStr} · {t.label} · {lookupConst(actor.constituency).label}</div>
+        </div>
+        <div className="actor-actions">
+          <button className="icon-btn" onClick={() => setEditing(e => !e)}>{editing ? "Close" : "Edit"}</button>
+          <button className="icon-btn delete" onClick={() => onDelete(actor.id)}>Del</button>
+        </div>
+      </div>
+      {editing && (
+        <div className="actor-edit-body">
+          <ActorForm
+            initial={actor}
+            onCommit={(d) => onUpdate(actor.id, d)}
+            onCancel={() => setEditing(false)}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ========= Map ========= */
+
+function NetworkMap({ org, actors }) {
+  const svgRef = useRef(null);
+  const containerRef = useRef(null);
+  const simRef = useRef(null);
+  const nodesRef = useRef([]);   // mutable simulation state
+  const linksRef = useRef([]);
+  const [size, setSize] = useState({ w: 800, h: 600 });
+  const [tip, setTip] = useState(null); // {x, y, actor}
+
+  // Resize observer
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const ro = new ResizeObserver((entries) => {
+      const r = entries[0].contentRect;
+      setSize({ w: r.width, h: r.height });
+    });
+    ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, []);
+
+  // Sync nodes & links with actors data, run simulation
+  useEffect(() => {
+    const W = size.w, H = size.h;
+    const cx = W / 2, cy = H / 2;
+
+    // Build desired node list
+    const desired = [
+      { id: "__ego__", isEgo: true, name: org.orgName || "Your Organization", r: 38, fx: cx, fy: cy },
+      ...actors.map(a => {
+        const t = lookupType(a.actorType);
+        const c = lookupConst(a.constituency);
+        const hf = highestFace(a.faces);
+        return {
+          id: a.id,
+          actor: a,
+          color: t.color,
+          r: c.radius,
+          highestFace: hf,
+        };
+      })
+    ];
+
+    // Preserve x/y between renders
+    const prev = new Map(nodesRef.current.map(n => [n.id, n]));
+    const nodes = desired.map(d => {
+      const old = prev.get(d.id);
+      if (old) return Object.assign(old, d);
+      // New node: place near rim
+      const angle = Math.random() * Math.PI * 2;
+      return Object.assign({
+        x: cx + Math.cos(angle) * 180,
+        y: cy + Math.sin(angle) * 180
+      }, d);
+    });
+
+    // Pin ego
+    nodes.forEach(n => {
+      if (n.isEgo) { n.fx = cx; n.fy = cy; }
+      else { n.fx = null; n.fy = null; }
+    });
+
+    // Links: ego → each actor
+    const links = nodes
+      .filter(n => !n.isEgo)
+      .map(n => ({
+        source: "__ego__",
+        target: n.id,
+        face: n.highestFace,
+        distance: 110 + (4 - (n.highestFace || 0.5)) * 35
+      }));
+
+    nodesRef.current = nodes;
+    linksRef.current = links;
+
+    if (!simRef.current) {
+      simRef.current = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id(d => d.id).distance(d => d.distance).strength(0.45))
+        .force("charge", d3.forceManyBody().strength(-260))
+        .force("collide", d3.forceCollide().radius(d => d.r + 8).iterations(2))
+        .force("center", d3.forceX(cx).strength(0.02))
+        .force("centerY", d3.forceY(cy).strength(0.02))
+        .alphaDecay(0.045)
+        .velocityDecay(0.55);
+    } else {
+      simRef.current.nodes(nodes);
+      simRef.current.force("link").links(links);
+      simRef.current.force("center", d3.forceX(cx).strength(0.02));
+      simRef.current.force("centerY", d3.forceY(cy).strength(0.02));
+      simRef.current.alpha(0.55).restart();
+    }
+
+    // Tick render directly to SVG (avoid React re-renders per tick)
+    const svg = d3.select(svgRef.current);
+    const linkSel = svg.select(".links").selectAll("line")
+      .data(links, d => d.target.id || d.target);
+    linkSel.exit().remove();
+    const linkEnter = linkSel.enter().append("line").attr("class", "edge");
+    const linkAll = linkEnter.merge(linkSel)
+      .attr("stroke", d => EDGE_STYLE[d.face || 0].stroke)
+      .attr("stroke-width", d => EDGE_STYLE[d.face || 0].width)
+      .attr("stroke-dasharray", d => EDGE_STYLE[d.face || 0].dash || "")
+      .attr("opacity", d => EDGE_STYLE[d.face || 0].opacity);
+
+    const nodeGroup = svg.select(".nodes").selectAll("g.node")
+      .data(nodes, d => d.id);
+    nodeGroup.exit().remove();
+    const nodeEnter = nodeGroup.enter().append("g").attr("class", "node");
+    nodeEnter.append("circle").attr("class", "node-circle");
+    nodeEnter.append("text").attr("class", "node-label");
+    const nodeAll = nodeEnter.merge(nodeGroup);
+    nodeAll.select("circle.node-circle")
+      .attr("r", d => d.r)
+      .attr("fill", d => d.isEgo ? "var(--paper)" : d.color)
+      .attr("stroke", d => d.isEgo ? "var(--cobalt)" : "rgba(23,21,20,0.25)")
+      .attr("stroke-width", d => d.isEgo ? 2.5 : 1)
+      .style("opacity", d => d.isEgo ? 1 : (d.highestFace === 0 ? 0.55 : 1));
+    nodeAll.select("text.node-label")
+      .attr("class", d => "node-label" + (d.isEgo ? " ego" : ""))
+      .attr("text-anchor", "middle")
+      .attr("dy", d => d.r + 13)
+      .text(d => d.isEgo ? d.name : (d.actor?.name || "—"));
+
+    // Hover behaviors
+    nodeAll
+      .on("mouseenter", function(event, d) {
+        if (d.isEgo) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        setTip({
+          x: event.clientX - rect.left,
+          y: event.clientY - rect.top,
+          actor: d.actor
+        });
+        d3.select(this).select("circle").attr("stroke-width", 2.5);
+      })
+      .on("mousemove", function(event, d) {
+        if (d.isEgo) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        setTip(t => t ? { ...t, x: event.clientX - rect.left, y: event.clientY - rect.top } : t);
+      })
+      .on("mouseleave", function(event, d) {
+        if (d.isEgo) return;
+        setTip(null);
+        d3.select(this).select("circle").attr("stroke-width", 1);
+      });
+
+    // Drag
+    const drag = d3.drag()
+      .on("start", function(event, d) {
+        if (d.isEgo) return;
+        if (!event.active) simRef.current.alphaTarget(0.2).restart();
+        d.fx = d.x; d.fy = d.y;
+      })
+      .on("drag", function(event, d) {
+        if (d.isEgo) return;
+        d.fx = event.x; d.fy = event.y;
+      })
+      .on("end", function(event, d) {
+        if (d.isEgo) return;
+        if (!event.active) simRef.current.alphaTarget(0);
+        d.fx = null; d.fy = null;
+      });
+    nodeAll.call(drag);
+
+    simRef.current.on("tick", () => {
+      linkAll
+        .attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+      nodeAll.attr("transform", d => `translate(${d.x}, ${d.y})`);
+    });
+  }, [actors, org.orgName, size.w, size.h]);
+
+  return (
+    <div ref={containerRef} style={{ width: "100%", height: "100%", position: "relative" }}>
+      <svg ref={svgRef} className="map-svg" viewBox={`0 0 ${size.w} ${size.h}`} preserveAspectRatio="xMidYMid meet">
+        <g className="links"></g>
+        <g className="nodes"></g>
+      </svg>
+
+      <div className="legend">
+        <h3>Actor type</h3>
+        {ACTOR_TYPES.map(t => (
+          <div className="item" key={t.value}>
+            <span className="swatch" style={{ background: t.color }}></span>
+            <span>{t.label}</span>
+          </div>
+        ))}
+        <h3>Constituency size</h3>
+        {CONSTITUENCY.map(c => (
+          <div className="item" key={c.value}>
+            <span className="swatch size-swatch" style={{ width: c.radius * 0.6, height: c.radius * 0.6 }}></span>
+            <span>{c.label}</span>
+          </div>
+        ))}
+        <h3>Highest face of power</h3>
+        {[3, 2, 1, 0].map(f => {
+          const s = EDGE_STYLE[f];
+          return (
+            <div className="item" key={f}>
+              <svg className="edge-swatch" width="24" height="6">
+                <line x1="0" y1="3" x2="24" y2="3"
+                  stroke={s.stroke} strokeWidth={s.width}
+                  strokeDasharray={s.dash || ""}
+                  opacity={s.opacity}/>
+              </svg>
+              <span>{f === 0 ? "No relationship" : f === 1 ? "Decision-making" : f === 2 ? "Agenda" : "Ideological"}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      {tip && tip.actor && (
+        <div className="map-tooltip" style={{
+          left: Math.min(tip.x + 14, size.w - 270),
+          top: Math.min(tip.y + 14, size.h - 120)
+        }}>
+          <div className="tt-name">{tip.actor.name}</div>
+          <div className="tt-meta">
+            {[tip.actor.title, tip.actor.organization].filter(Boolean).join(" · ")}
+          </div>
+          <div className="tt-meta">{lookupType(tip.actor.actorType).label} · {lookupConst(tip.actor.constituency).label}</div>
+          <div className="tt-faces">
+            {tip.actor.faces && tip.actor.faces.length
+              ? (tip.actor.faces.includes(0) ? "Face 0 — No power relationship" : "Faces " + tip.actor.faces.join(", "))
+              : "Faces unset"}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ========= Power grid view ========= */
+
+function PowerGrid({ actors, onUpdateActor }) {
+  const hostRef = useRef(null);
+  const svgRef = useRef(null);
+  const [size, setSize] = useState({ w: 800, h: 600 });
+  const [tip, setTip] = useState(null);
+  const [dragId, setDragId] = useState(null);
+
+  useEffect(() => {
+    if (!hostRef.current) return;
+    const ro = new ResizeObserver(entries => {
+      const r = entries[0].contentRect;
+      setSize({ w: r.width, h: r.height });
+    });
+    ro.observe(hostRef.current);
+    return () => ro.disconnect();
+  }, []);
+
+  const PAD_X = 110;
+  const PAD_Y = 70;
+  const plotSide = Math.max(200, Math.min(size.w - PAD_X * 2, size.h - PAD_Y * 2));
+  const cx = size.w / 2, cy = size.h / 2;
+  const half = plotSide / 2;
+  const xFor = (gx) => cx + gx * half;
+  const yFor = (gy) => cy - gy * half;
+  const fromPx = (px, py) => {
+    const gx = Math.max(-1, Math.min(1, (px - cx) / half));
+    const gy = Math.max(-1, Math.min(1, (cy - py) / half));
+    return [Number(gx.toFixed(2)), Number(gy.toFixed(2))];
+  };
+
+  const onDotDown = (e, actor) => {
+    e.preventDefault(); e.stopPropagation();
+    setDragId(actor.id);
+  };
+  useEffect(() => {
+    if (!dragId) return;
+    const move = (e) => {
+      const rect = svgRef.current.getBoundingClientRect();
+      const sx = (e.clientX - rect.left) * (size.w / rect.width);
+      const sy = (e.clientY - rect.top) * (size.h / rect.height);
+      const [gx, gy] = fromPx(sx, sy);
+      onUpdateActor(dragId, { gridX: gx, gridY: gy });
+    };
+    const up = () => setDragId(null);
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", up);
+    return () => {
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseup", up);
+    };
+  }, [dragId, size.w, size.h, onUpdateActor]);
+
+  // Quadrant labels
+  const quads = [
+    { num: "3", strategy: "Engage & redirect",        sx: cx + half * 0.5, sy: cy - half * 0.93 },
+    { num: "2", strategy: "Divide & neutralize",      sx: cx - half * 0.5, sy: cy - half * 0.93 },
+    { num: "1", strategy: "Organize a base",          sx: cx + half * 0.5, sy: cy + half * 0.93 },
+    { num: "4", strategy: "Disorganize / reorganize", sx: cx - half * 0.5, sy: cy + half * 0.93 },
+  ];
+
+  return (
+    <div ref={hostRef} className="grid-stage">
+      <svg ref={svgRef} className="grid-svg" width={size.w} height={size.h} viewBox={`0 0 ${size.w} ${size.h}`}>
+        {/* plot background */}
+        <rect x={cx - half} y={cy - half} width={plotSide} height={plotSide}
+              fill="#f5eedb" stroke="var(--rule)" strokeWidth="1" />
+        {/* quadrant subtle bg tints */}
+        <rect x={cx} y={cy - half} width={half} height={half} fill="rgba(19,48,107,0.025)" />
+        <rect x={cx - half} y={cy - half} width={half} height={half} fill="rgba(183,67,43,0.04)" />
+        <rect x={cx} y={cy} width={half} height={half} fill="rgba(107,122,58,0.04)" />
+        <rect x={cx - half} y={cy} width={half} height={half} fill="rgba(74,85,102,0.035)" />
+
+        {/* axes */}
+        <line x1={cx - half} y1={cy} x2={cx + half} y2={cy} stroke="var(--rule)" strokeWidth="1" />
+        <line x1={cx} y1={cy - half} x2={cx} y2={cy + half} stroke="var(--rule)" strokeWidth="1" />
+
+        {/* axis labels */}
+        <text className="grid-axis-label" x={cx} y={cy - half - 18} textAnchor="middle">Powerful</text>
+        <text className="grid-axis-label" x={cx} y={cy + half + 28} textAnchor="middle">Not powerful</text>
+        <text className="grid-axis-label" x={cx - half - 12} y={cy} textAnchor="end" dominantBaseline="middle">Opponent</text>
+        <text className="grid-axis-label" x={cx + half + 12} y={cy} textAnchor="start" dominantBaseline="middle">Supporter</text>
+
+        {/* quadrant strategy labels */}
+        {quads.map((q, i) => (
+          <g key={i}>
+            <text className="grid-quad-label" x={q.sx} y={q.sy} textAnchor="middle">{q.num}</text>
+            <text className="grid-quad-strategy" x={q.sx} y={q.sy + 16} textAnchor="middle">{q.strategy}</text>
+          </g>
+        ))}
+
+        {/* actor dots */}
+        {actors.map(a => {
+          const t = lookupType(a.actorType);
+          const c = lookupConst(a.constituency);
+          const ax = xFor(a.gridX ?? 0);
+          const ay = yFor(a.gridY ?? 0);
+          const isOpponent = (a.gridX ?? 0) < 0;
+          return (
+            <g key={a.id}
+               className={"grid-dot" + (dragId === a.id ? " dragging" : "")}
+               transform={`translate(${ax}, ${ay})`}
+               onMouseDown={(e) => onDotDown(e, a)}
+               onMouseEnter={(e) => {
+                 const rect = hostRef.current.getBoundingClientRect();
+                 setTip({
+                   x: e.clientX - rect.left,
+                   y: e.clientY - rect.top,
+                   actor: a
+                 });
+               }}
+               onMouseMove={(e) => {
+                 if (!tip) return;
+                 const rect = hostRef.current.getBoundingClientRect();
+                 setTip(t => t ? { ...t, x: e.clientX - rect.left, y: e.clientY - rect.top } : t);
+               }}
+               onMouseLeave={() => setTip(null)}>
+              <circle r={c.radius * 0.7} fill={t.color}
+                      stroke={isOpponent ? "var(--terracotta)" : "rgba(23,21,20,0.3)"}
+                      strokeWidth={isOpponent ? 2 : 1}
+                      opacity="0.92" />
+              <text x="0" y={c.radius * 0.7 + 13} textAnchor="middle"
+                    className="node-label" style={{fontSize: 10.5}}>
+                {a.name.split(" ").slice(-2).join(" ")}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+
+      <div className="legend" style={{top: 18, right: 18}}>
+        <h3>Quadrants (Cushman, 2014/2023)</h3>
+        <div className="item"><span style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--cobalt)",width:14}}>1</span><span>Organize a base — lower right</span></div>
+        <div className="item"><span style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--cobalt)",width:14}}>2</span><span>Divide & neutralize — upper left</span></div>
+        <div className="item"><span style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--cobalt)",width:14}}>3</span><span>Engage & redirect — upper right</span></div>
+        <div className="item"><span style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--cobalt)",width:14}}>4</span><span>Disorganize / reorganize — lower left</span></div>
+        <h3>Tip</h3>
+        <div className="item" style={{fontSize: 11, fontStyle:"italic", color:"var(--mute)"}}>
+          Drag any dot to reposition. Edit in the form for precise coords.
+        </div>
+      </div>
+
+      {tip && tip.actor && (
+        <div className="map-tooltip" style={{
+          left: Math.min(tip.x + 14, size.w - 270),
+          top: Math.min(tip.y + 14, size.h - 120)
+        }}>
+          <div className="tt-name">{tip.actor.name}</div>
+          <div className="tt-meta">{[tip.actor.title, tip.actor.organization].filter(Boolean).join(" · ")}</div>
+          <div className="tt-meta">{lookupType(tip.actor.actorType).label} · {lookupConst(tip.actor.constituency).label}</div>
+          <div className="tt-faces">
+            Grid: {(tip.actor.gridX ?? 0) >= 0 ? "Supporter +" : "Opponent "}{Math.abs(tip.actor.gridX ?? 0).toFixed(2)}
+            {" · "}
+            {(tip.actor.gridY ?? 0) >= 0 ? "Powerful +" : "Not powerful "}{Math.abs(tip.actor.gridY ?? 0).toFixed(2)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ========= App ========= */
+
+function App() {
+  const [org, setOrg] = useState(SEED_ORG);
+  const [actors, setActors] = useState(seedActors());
+  const [orgOpen, setOrgOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(true);
+  const [listOpen, setListOpen] = useState(true);
+  const [view, setView] = useState("network");
+
+  const addActor = useCallback((draft) => {
+    setActors(prev => [...prev, { ...draft, id: "a" + (Date.now()) + Math.floor(Math.random()*1000) }]);
+  }, []);
+  const updateActor = useCallback((id, draft) => {
+    setActors(prev => prev.map(a => a.id === id ? { ...a, ...draft, id } : a));
+  }, []);
+  const deleteActor = useCallback((id) => {
+    setActors(prev => prev.filter(a => a.id !== id));
+  }, []);
+
+  const reset = () => {
+    setOrg(SEED_ORG);
+    setActors(seedActors());
+  };
+
+  const exportJSON = () => {
+    const payload = { org, actors, exportedAt: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `power-map-${(org.orgName || "untitled").toLowerCase().replace(/[^a-z0-9]+/g,"-")}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="app">
+      <header className="topbar">
+        <div className="title-block">
+          <span className="wordmark">Power Mapping Instrument</span>
+        </div>
+        <div style={{display:"flex", alignItems:"center", gap:14}}>
+          <span className="badge">Demo · data not saved</span>
+          <div className="top-actions">
+            <button className="btn btn-ghost" onClick={exportJSON}>Export JSON</button>
+            <button className="btn btn-ghost" onClick={reset}>Reset</button>
+          </div>
+        </div>
+      </header>
+
+      <div className="pane-wrap">
+        <aside className="left-pane">
+
+          <div style={{padding:"20px 20px 4px"}}>
+            <h1 style={{fontFamily:"var(--serif)", fontSize:22, fontWeight:400, margin:"0 0 4px"}}>Power Actors & Relationships</h1>
+            <p style={{fontFamily:"var(--serif)", fontSize:13, color:"var(--ink-2)", margin:"0 0 8px", lineHeight:1.5}}>
+              A snapshot of who shapes your organization's ability to make progress on its goals — and how power is currently functioning in each relationship.
+            </p>
+          </div>
+
+          <section className="section">
+            <div className="section-header" onClick={() => setOrgOpen(o => !o)}>
+              <h2>Organization & respondents</h2>
+              <span className="caret">{orgOpen ? "−" : "+"}</span>
+            </div>
+            {orgOpen && (
+              <div className="section-body">
+                <div className="field">
+                  <label>Organization name</label>
+                  <input value={org.orgName} onChange={e => setOrg({...org, orgName: e.target.value})} />
+                </div>
+                <div className="field-row">
+                  <div className="field">
+                    <label>Date</label>
+                    <input type="date" value={org.date} onChange={e => setOrg({...org, date: e.target.value})} />
+                  </div>
+                  <div className="field">
+                    <label>Participants</label>
+                    <input value={org.participants} onChange={e => setOrg({...org, participants: e.target.value})} placeholder="Roles in attendance" />
+                  </div>
+                </div>
+                <p className="note-line">The org sits at the center of the map. Its name renders as the ego node label.</p>
+              </div>
+            )}
+          </section>
+
+          <section className="section">
+            <div className="section-header" onClick={() => setAddOpen(o => !o)}>
+              <h2>Add a power actor</h2>
+              <span className="caret">{addOpen ? "−" : "+"}</span>
+            </div>
+            {addOpen && (
+              <div className="section-body">
+                <ActorForm onCommit={addActor} />
+              </div>
+            )}
+          </section>
+
+          <section className="section">
+            <div className="section-header" onClick={() => setListOpen(o => !o)}>
+              <h2>Actors entered ({actors.length})</h2>
+              <span className="caret">{listOpen ? "−" : "+"}</span>
+            </div>
+            {listOpen && (
+              <div className="section-body">
+                {actors.length === 0 ? (
+                  <div className="empty">No actors yet. Add one above to populate the map.</div>
+                ) : (
+                  <div className="actor-list">
+                    {actors.map(a => (
+                      <ActorCard key={a.id} actor={a} onUpdate={updateActor} onDelete={deleteActor} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
+
+          <div className="footer-hint">
+            Mockup for methodology review — not a production instrument.
+          </div>
+        </aside>
+
+        <main className="right-pane">
+          <div className="tabs">
+            <button className={"tab" + (view === "network" ? " active" : "")} onClick={() => setView("network")}>Network</button>
+            <button className={"tab" + (view === "grid" ? " active" : "")} onClick={() => setView("grid")}>Power grid</button>
+          </div>
+          <div className="view-host">
+            {view === "network"
+              ? <NetworkMap org={org} actors={actors} />
+              : <PowerGrid actors={actors} onUpdateActor={updateActor} />}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
