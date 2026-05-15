@@ -138,13 +138,16 @@
     color: var(--cobalt); width: 14px; flex-shrink: 0;
   }
   .face-row.zero .face-num { color: var(--terracotta); }
-  .face-row .face-text { flex: 1; }
+  .face-row .face-text { flex: 1; display: flex; flex-direction: column; }
   .face-row .face-label {
-    font-family: var(--sans); font-weight: 400; font-size: 13px; color: var(--ink);
+    display: block;
+    font-family: var(--sans); font-weight: 500; font-size: 13px; color: var(--ink);
+    line-height: 1.3;
   }
   .face-row .face-desc {
-    font-family: var(--sans); font-weight: 300; font-size: 12px; line-height: 1.45;
-    color: var(--mute); margin-top: 3px;
+    display: block;
+    font-family: var(--sans); font-weight: 300; font-size: 12.5px; line-height: 1.5;
+    color: var(--ink); margin-top: 4px;
   }
 
   /* Buttons */
@@ -1246,7 +1249,7 @@ function App() {
           </section>
 
           <div className="footer-hint">
-            Mockup for methodology review — not a production instrument.
+            Mockup for methodology review — not a production instrument (yet).
           </div>
         </aside>
 
