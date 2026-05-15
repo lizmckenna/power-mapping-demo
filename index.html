@@ -928,6 +928,9 @@ function NetworkMap({ org, actors }) {
           </div>
         ))}
         <h3>Highest face of power</h3>
+        <div style={{fontSize:11, fontStyle:"italic", color:"var(--mute)", lineHeight:1.4, marginBottom:6}}>
+          If an actor is engaged across multiple faces, the edge shows the highest.
+        </div>
         {[3, 2, 1, 0].map(f => {
           const s = EDGE_STYLE[f];
           return (
