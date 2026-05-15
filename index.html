@@ -407,22 +407,22 @@ const CONSTITUENCY = [
 const FACES = [
   {
     value: 0,
-    label: "No power relationship",
+    label: "No relationship",
     desc: "You may not know this person, or you know them only socially or professionally — not in the context of building or contesting political power."
   },
   {
     value: 1,
-    label: "Decision-making power",
+    label: "Shared policy interest / campaign",
     desc: "Engaging around specific policy, programmatic, or campaign goals — working to determine the outcome of a contested decision."
   },
   {
     value: 2,
-    label: "Agenda power",
+    label: "Agenda-setting",
     desc: "Shaping what issues and solutions are on the agenda, who has a seat at the table, and how decisions are made."
   },
   {
     value: 3,
-    label: "Ideological power",
+    label: "Co-conspirator (values / ideology)",
     desc: "Reshaping how issues, constituencies, and solutions are understood — shifting narratives about what is just, legitimate, and possible."
   }
 ];
@@ -934,8 +934,8 @@ function NetworkMap({ org, actors }) {
         {[3, 2, 1, 0].map(f => {
           const s = EDGE_STYLE[f];
           const label = f === 0 ? "No relationship (isolated)"
-                      : f === 1 ? "Decision-making"
-                      : f === 2 ? "Agenda" : "Ideological";
+                      : f === 1 ? "Shared policy interest / campaign"
+                      : f === 2 ? "Agenda-setting" : "Co-conspirator (values / ideology)";
           return (
             <div className="item" key={f}>
               <svg className="edge-swatch" width="28" height="10">
