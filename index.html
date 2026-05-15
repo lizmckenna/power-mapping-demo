@@ -27,6 +27,7 @@
     --olive: #6b7a3a;
     --amber: #c89342;
     --slate: #4a5566;
+    --ego: #0d3d45;
     --serif: "Source Serif 4", Georgia, serif;
     --sans: "Work Sans", -apple-system, system-ui, sans-serif;
     --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
@@ -846,8 +847,8 @@ function NetworkMap({ org, actors }) {
     const nodeAll = nodeEnter.merge(nodeGroup);
     nodeAll.select("circle.node-circle")
       .attr("r", d => d.r)
-      .attr("fill", d => d.isEgo ? "var(--paper)" : d.color)
-      .attr("stroke", d => d.isEgo ? "var(--cobalt)" : "rgba(23,21,20,0.25)")
+      .attr("fill", d => d.isEgo ? "#0d3d45" : d.color)
+      .attr("stroke", d => d.isEgo ? "#efe6d1" : "rgba(23,21,20,0.25)")
       .attr("stroke-width", d => d.isEgo ? 2.5 : 1)
       .style("opacity", 1);
     nodeAll.select("text.node-label")
