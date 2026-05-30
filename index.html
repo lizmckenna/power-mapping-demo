@@ -321,21 +321,32 @@
     position: absolute; top: 41px; left: 0; right: 0; bottom: 0;
   }
 
-  /* Grid bottom legend — two boxes side by side, network-map aesthetic */
-  .grid-legends {
-    position: absolute; left: 18px; bottom: 18px; z-index: 2;
-    display: flex; gap: 12px; align-items: flex-end;
-    pointer-events: none;
-  }
-  .grid-legends .legend {
-    /* re-use .legend look (white box, border, padding) but no absolute positioning here */
-    position: static;
+  /* Grid bottom legends — pinned to opposite bottom corners, network-map aesthetic */
+  .grid-legend-left,
+  .grid-legend-right {
+    position: absolute; bottom: 18px; z-index: 2;
     background: rgba(255, 255, 255, 0.97);
     border: 1px solid var(--rule);
     border-radius: 6px;
     padding: 12px 14px;
-    max-width: 240px;
+    max-width: 260px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    pointer-events: none;
+  }
+  .grid-legend-left  { left: 18px; }
+  .grid-legend-right { right: 18px; }
+  .grid-legend-left h3, .grid-legend-right h3 {
+    margin: 0 0 8px;
+    font-family: var(--mono); font-size: 9.5px; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--cobalt);
+  }
+  .grid-legend-left .item, .grid-legend-right .item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11.5px; color: var(--ink-2);
+    padding: 2px 0;
+  }
+  .grid-legend-left .swatch, .grid-legend-right .swatch {
+    width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
   }
 
   /* ===== Power grid ===== */
@@ -531,13 +542,13 @@ const anchorFor = (arr, v) => arr.find(a => a.v === v) || arr[Math.floor(arr.len
 const anchorText = (a) => a.body ? a.bold + ": " + a.body : a.bold;
 
 
-// Groundwork-aligned categorical palette — clean, white-bg legible, harmonious with --cobalt
+// Groundwork-aligned categorical palette, clean and white-bg legible
 const ACTOR_TYPES = [
-  { value: "elected",     label: "Elected official",                     color: "#3b5bdb" }, // indigo — institutional
-  { value: "gov_staff",   label: "Government staff",                     color: "#0e8a78" }, // teal — administrative
-  { value: "base_org",    label: "Base-building org leader",             color: "#5c7dfa" }, // brand purple — our people
-  { value: "advocacy",    label: "Advocacy org leader",                  color: "#d97706" }, // amber — visibility
-  { value: "operative",   label: "Other influential leader / operative", color: "#475569" }, // slate — connector
+  { value: "elected",     label: "Elected official",                     color: "#0f172a" }, // near-black slate, institutional
+  { value: "gov_staff",   label: "Government staff",                     color: "#0e8a78" }, // teal, administrative
+  { value: "base_org",    label: "Base-building org leader",             color: "#5c7dfa" }, // brand purple, our people
+  { value: "advocacy",    label: "Advocacy org leader",                  color: "#d97706" }, // amber, visibility
+  { value: "operative",   label: "Other influential leader / operative", color: "#a16207" }, // ochre, connector
 ];
 
 const CONSTITUENCY = [
@@ -1356,8 +1367,7 @@ function PowerGrid({ actors, onUpdateActor }) {
                }}
                onMouseLeave={() => setTip(null)}>
               <circle r={c.radius * 0.7} fill={t.color}
-                      stroke={isOpponent ? "var(--terracotta)" : "rgba(23,21,20,0.3)"}
-                      strokeWidth={isOpponent ? 2 : 1}
+                      stroke="rgba(23,21,20,0.3)" strokeWidth="1"
                       opacity="0.92" />
               <text x="0" y={c.radius * 0.7 + 13} textAnchor="middle"
                     className="node-label" style={{fontSize: 10.5}}>
@@ -1401,7 +1411,7 @@ function PowerGrid({ actors, onUpdateActor }) {
 function App() {
   const [org, setOrg] = useState(SEED_ORG);
   const [actors, setActors] = useState(seedActors());
-  const [orgOpen, setOrgOpen] = useState(false);
+  const [orgOpen, setOrgOpen] = useState(true);
   const [addOpen, setAddOpen] = useState(true);
   const [listOpen, setListOpen] = useState(true);
   const [view, setView] = useState("grid"); // power grid is the default — most familiar to organizers
@@ -1545,6 +1555,22 @@ function App() {
           </div>
 
           <section className="section">
+            <div className="section-header" onClick={() => setOrgOpen(o => !o)}>
+              <h2>Your organization (for the network map)</h2>
+              <span className="caret">{orgOpen ? "−" : "+"}</span>
+            </div>
+            {orgOpen && (
+              <div className="section-body">
+                <div className="field">
+                  <label>Organization name</label>
+                  <input value={org.orgName} onChange={e => setOrg({...org, orgName: e.target.value})} />
+                </div>
+                <p className="note-line">The org sits at the center of the Network view. Its name renders as the ego node label. Date + filled-out-by are captured in the top bar.</p>
+              </div>
+            )}
+          </section>
+
+          <section className="section">
             <div className="section-header" onClick={() => setAddOpen(o => !o)}>
               <h2>Add a power actor</h2>
               <span className="caret">{addOpen ? "−" : "+"}</span>
@@ -1576,22 +1602,6 @@ function App() {
             )}
           </section>
 
-          <section className="section">
-            <div className="section-header" onClick={() => setOrgOpen(o => !o)}>
-              <h2>Your organization (for the network map)</h2>
-              <span className="caret">{orgOpen ? "−" : "+"}</span>
-            </div>
-            {orgOpen && (
-              <div className="section-body">
-                <div className="field">
-                  <label>Organization name</label>
-                  <input value={org.orgName} onChange={e => setOrg({...org, orgName: e.target.value})} />
-                </div>
-                <p className="note-line">The org sits at the center of the Network view. Its name renders as the ego node label. Date + filled-out-by are captured in the top bar.</p>
-              </div>
-            )}
-          </section>
-
         </aside>
 
         <main className="right-pane">
@@ -1607,8 +1617,8 @@ function App() {
           </div>
 
           {view === "grid" && (
-            <div className="grid-legends">
-              <div className="legend">
+            <>
+              <div className="grid-legend-left">
                 <h3>Actor type</h3>
                 {ACTOR_TYPES.map(t => (
                   <div className="item" key={t.value}>
@@ -1617,17 +1627,17 @@ function App() {
                   </div>
                 ))}
               </div>
-              <div className="legend">
+              <div className="grid-legend-right">
                 <h3>Bubble size</h3>
                 {CONSTITUENCY.map(c => (
                   <div className="item" key={c.value}>
-                    <span className="swatch size-swatch"
-                          style={{width: c.radius * 0.6, height: c.radius * 0.6, background: "var(--mute)"}}></span>
+                    <span className="swatch"
+                          style={{width: c.radius * 0.55, height: c.radius * 0.55, background: "var(--mute)"}}></span>
                     <span>{c.label}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </>
           )}
         </main>
       </div>
