@@ -462,8 +462,8 @@ const { useState, useEffect, useRef, useMemo, useCallback } = React;
    These are safe to embed in client-side code (Supabase's standard pattern);
    RLS policy `anon insert power_map_snapshots` restricts what anonymous
    submissions can do (only INSERT demo rows, never read or update). */
-const SUPABASE_URL      = "REPLACE_WITH_GW_SUPABASE_URL";   // e.g. https://abcdefg.supabase.co
-const SUPABASE_ANON_KEY = "REPLACE_WITH_GW_SUPABASE_ANON_KEY";
+const SUPABASE_URL      = "https://jddrxzirkkmpsqqrmsea.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkZHJ4emlya2ttcHNxcXJtc2VhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMTY0MjQsImV4cCI6MjA4ODU5MjQyNH0.RBk3fRlL6thd7AT3YBdmxEXpmtb_KoY9hHAOPUWREME";
 const PERSIST_ENABLED   = !SUPABASE_URL.startsWith("REPLACE") && !SUPABASE_ANON_KEY.startsWith("REPLACE");
 
 async function saveSnapshotToSupabase({ snapshotDate, filledOutBy, orgName, payload }) {
