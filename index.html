@@ -59,18 +59,19 @@
     background: var(--paper);
   }
   .wordmark {
-    font-family: var(--mono); font-size: 11px; font-weight: 500;
-    letter-spacing: 0.18em; text-transform: uppercase; color: var(--cobalt);
+    font-family: var(--display); font-size: 22px; font-weight: 700;
+    letter-spacing: -0.01em; color: var(--ink);
+    line-height: 1.1;
   }
-  .wordmark .dot { color: var(--terracotta); margin: 0 6px; }
-  .title-block { display: flex; align-items: baseline; gap: 14px; }
+  .wordmark .dot { color: var(--cobalt); margin: 0 6px; }
+  .title-block { display: flex; flex-direction: column; gap: 4px; }
   .title-block h1 {
-    font-family: var(--serif); font-weight: 400; font-size: 20px;
-    margin: 0; color: var(--ink);
+    font-family: var(--display); font-weight: 700; font-size: 22px;
+    margin: 0; color: var(--ink); letter-spacing: -0.01em;
   }
   .title-block .sub {
-    font-family: var(--mono); font-size: 10px; color: var(--mute);
-    letter-spacing: 0.12em; text-transform: uppercase;
+    font-family: var(--sans); font-size: 13px; color: var(--mute);
+    font-weight: 400; letter-spacing: 0; text-transform: none;
   }
   .badge {
     font-family: var(--mono); font-size: 10px; font-weight: 500;
@@ -126,35 +127,37 @@
   }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-  /* Face checkboxes */
-  .faces-grid { display: flex; flex-direction: column; gap: 6px; }
+  /* Faces of power — clean toggle rows, no checkbox visuals */
+  .faces-grid { display: flex; flex-direction: column; gap: 4px; }
   .face-row {
-    display: flex; align-items: flex-start; gap: 9px;
-    padding: 8px 10px;
-    border: 1px solid var(--rule); border-radius: 2px;
+    position: relative;
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px;
+    border: 1px solid var(--rule); border-radius: 4px;
     background: var(--paper); cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
+    transition: background 0.12s, border-color 0.12s;
+    user-select: none;
   }
-  .face-row:hover { border-color: var(--cobalt-soft); }
-  .face-row.selected { background: #e9e0ca; border-color: var(--cobalt); }
-  .face-row.zero.selected { background: #f0d9d2; border-color: var(--terracotta); }
-  .face-row input { margin: 3px 0 0; accent-color: var(--cobalt); flex-shrink: 0; }
+  .face-row:hover { border-color: var(--cobalt-soft); background: var(--paper-tint); }
+  .face-row.selected { background: rgba(92,125,250,0.08); border-color: var(--cobalt); }
+  .face-row.zero.selected { background: var(--cream-2); border-color: var(--mute); }
   .face-row .face-num {
-    font-family: var(--mono); font-size: 11px; font-weight: 500;
-    color: var(--cobalt); width: 14px; flex-shrink: 0;
+    font-family: var(--sans); font-size: 13px; font-weight: 600;
+    color: var(--mute); width: 16px; flex-shrink: 0; line-height: 1;
   }
-  .face-row.zero .face-num { color: var(--terracotta); }
-  .face-row .face-text { flex: 1; display: flex; flex-direction: column; }
+  .face-row.selected .face-num { color: var(--cobalt); }
+  .face-row.zero.selected .face-num { color: var(--ink-2); }
   .face-row .face-label {
-    display: block;
+    flex: 1;
     font-family: var(--sans); font-weight: 500; font-size: 13px; color: var(--ink);
-    line-height: 1.3;
+    line-height: 1.3; letter-spacing: 0;
   }
-  .face-row .face-desc {
-    display: block;
-    font-family: var(--sans); font-weight: 300; font-size: 12.5px; line-height: 1.5;
-    color: var(--ink); margin-top: 4px;
+  .face-row .face-info {
+    font-family: var(--sans); font-size: 11px; color: var(--mute);
+    flex-shrink: 0; opacity: 0.7;
   }
+  .face-row:hover .face-info { opacity: 1; color: var(--cobalt); }
+  /* Native tooltip styling — browsers handle `title` attr; can't restyle, but the content is plain sentence-case sans-serif */
 
   /* Buttons */
   .btn {
@@ -221,13 +224,14 @@
   .map-svg { width: 100%; height: 100%; display: block; }
   .legend {
     position: absolute; top: 18px; right: 18px;
-    background: rgba(245, 238, 219, 0.96);
+    background: rgba(255, 255, 255, 0.97);
     border: 1px solid var(--rule);
-    border-radius: 2px;
+    border-radius: 6px;
     padding: 14px 16px;
-    max-width: 240px;
+    max-width: 260px;
     pointer-events: none;
     z-index: 2;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
   }
   .legend h3 {
     margin: 0 0 8px;
@@ -262,11 +266,11 @@
   /* SVG defaults */
   .node-circle { cursor: pointer; transition: stroke-width 0.15s; }
   .node-label {
-    font-family: var(--sans); font-size: 10.5px; font-weight: 400;
+    font-family: var(--sans); font-size: 10.5px; font-weight: 500;
     fill: var(--ink); pointer-events: none;
-    paint-order: stroke; stroke: rgba(239,230,209,0.85); stroke-width: 3px;
+    paint-order: stroke; stroke: rgba(255,255,255,0.92); stroke-width: 3px;
   }
-  .node-label.ego { font-size: 12.5px; font-weight: 500; }
+  .node-label.ego { font-size: 12.5px; font-weight: 600; }
 
   /* ===== Tabs ===== */
   .tabs {
@@ -314,20 +318,20 @@
   .grid-dot { cursor: grab; }
   .grid-dot.dragging { cursor: grabbing; }
 
-  /* ===== Mini grid picker (in form) ===== */
+  /* ===== Mini grid picker (in form) — integer snap, -5..+5 ===== */
   .mini-grid-wrap {
     display: grid;
-    grid-template-columns: 56px 1fr 56px;
-    grid-template-rows: 18px 1fr 18px;
-    gap: 4px;
-    max-width: 280px;
+    grid-template-columns: 70px 1fr 70px;
+    grid-template-rows: 20px 1fr 20px;
+    gap: 6px;
+    max-width: 320px;
     margin: 6px 0 6px;
   }
   .mini-grid-axis-lbl {
-    font-family: var(--mono); font-size: 9px; font-weight: 500;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--mute);
+    font-family: var(--sans); font-size: 11px; font-weight: 600;
+    color: var(--ink-2);
     display: flex; align-items: center; justify-content: center;
+    cursor: help;
   }
   .mini-grid-axis-lbl.left { justify-content: flex-end; padding-right: 4px; }
   .mini-grid-axis-lbl.right { justify-content: flex-start; padding-left: 4px; }
@@ -336,10 +340,21 @@
     aspect-ratio: 1 / 1;
     background: var(--paper);
     border: 1px solid var(--rule);
-    border-radius: 2px;
+    border-radius: 4px;
     position: relative; cursor: crosshair;
+    overflow: hidden;
   }
-  .mini-grid-axes { position: absolute; inset: 0; }
+  /* faint integer grid lines via background gradient (11 cells per axis: -5..+5) */
+  .mini-grid::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(to right, var(--rule-soft) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--rule-soft) 1px, transparent 1px);
+    background-size: calc(100% / 10) calc(100% / 10);
+    pointer-events: none;
+  }
+  .mini-grid-axes { position: absolute; inset: 0; pointer-events: none; }
   .mini-grid-axes::before, .mini-grid-axes::after {
     content: ""; position: absolute; background: var(--rule);
   }
@@ -347,16 +362,20 @@
   .mini-grid-axes::after { top: 0; bottom: 0; left: 50%; width: 1px; }
   .mini-grid-dot {
     position: absolute;
-    width: 12px; height: 12px;
+    width: 14px; height: 14px;
     border-radius: 50%;
     transform: translate(-50%, -50%);
     border: 2px solid var(--paper);
-    box-shadow: 0 0 0 1px var(--ink);
+    box-shadow: 0 0 0 1.5px var(--ink);
     pointer-events: none;
   }
   .grid-coord-readout {
-    font-family: var(--mono); font-size: 10px; color: var(--mute);
-    letter-spacing: 0.05em;
+    font-family: var(--sans); font-size: 12px; color: var(--ink-2);
+    letter-spacing: 0; margin-top: 6px; font-weight: 500;
+  }
+  .grid-coord-readout .anchor {
+    display: block; font-weight: 400; color: var(--mute); font-size: 11.5px;
+    margin-top: 2px; line-height: 1.4;
   }
 
   /* Empty hint */
@@ -396,12 +415,48 @@ const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
 /* ========= Static config ========= */
 
+// Integer grid scale: -5 to +5 on both axes, whole numbers only.
+const GRID_MIN = -5;
+const GRID_MAX = 5;
+const clampGrid = (n) => Math.max(GRID_MIN, Math.min(GRID_MAX, Math.round(n)));
+
+// Behavioral anchors for hover/help text — informs both axes' tooltips.
+const POWER_ANCHORS = [
+  { v:  5, label: "Dominant in the arena — sets terms unilaterally" },
+  { v:  4, label: "Highly powerful — shapes outcomes regularly, rarely blocked" },
+  { v:  3, label: "Powerful — meaningful influence on most decisions in their lane" },
+  { v:  2, label: "Moderately powerful — influences some outcomes, needs allies" },
+  { v:  1, label: "Slightly powerful — voice that matters at the margins" },
+  { v:  0, label: "Mid-range — present but not consequential alone" },
+  { v: -1, label: "Slightly diminished — has a seat but easily overridden" },
+  { v: -2, label: "Limited — heard occasionally, rarely listened to" },
+  { v: -3, label: "Marginal — small enough to ignore most of the time" },
+  { v: -4, label: "Highly marginal — almost no leverage in the current arena" },
+  { v: -5, label: "No meaningful power — fully subject to others' decisions" },
+];
+const SUPPORT_ANCHORS = [
+  { v:  5, label: "Aligned champion — leads on our priorities, takes risks for them" },
+  { v:  4, label: "Strong supporter — reliable yes, will spend political capital" },
+  { v:  3, label: "Supporter — votes or acts with us when it matters" },
+  { v:  2, label: "Moderate supporter — mostly with us, hedges on hard asks" },
+  { v:  1, label: "Soft supporter — sympathetic, low effort" },
+  { v:  0, label: "Neutral or persuadable — undecided or uninvolved" },
+  { v: -1, label: "Soft opponent — leans against, low effort" },
+  { v: -2, label: "Moderate opponent — usually against us, will still dialogue" },
+  { v: -3, label: "Opponent — opposes most asks, will block when possible" },
+  { v: -4, label: "Strong opponent — actively organizes against us" },
+  { v: -5, label: "Implacable adversary — treats our success as their loss" },
+];
+const anchorFor = (arr, v) => arr.find(a => a.v === v) || arr[Math.floor(arr.length/2)];
+
+
+// Groundwork-aligned categorical palette — clean, white-bg legible, harmonious with --cobalt
 const ACTOR_TYPES = [
-  { value: "elected",     label: "Elected official",                  color: "#13306b" },
-  { value: "gov_staff",   label: "Government staff",                  color: "#6b7a3a" },
-  { value: "base_org",    label: "Base-building org leader",          color: "#b7432b" },
-  { value: "advocacy",    label: "Advocacy org leader",               color: "#c89342" },
-  { value: "operative",   label: "Other influential leader / operative", color: "#4a5566" },
+  { value: "elected",     label: "Elected official",                     color: "#3b5bdb" }, // indigo — institutional
+  { value: "gov_staff",   label: "Government staff",                     color: "#0e8a78" }, // teal — administrative
+  { value: "base_org",    label: "Base-building org leader",             color: "#5c7dfa" }, // brand purple — our people
+  { value: "advocacy",    label: "Advocacy org leader",                  color: "#d97706" }, // amber — visibility
+  { value: "operative",   label: "Other influential leader / operative", color: "#475569" }, // slate — connector
 ];
 
 const CONSTITUENCY = [
@@ -414,22 +469,22 @@ const FACES = [
   {
     value: 0,
     label: "No relationship",
-    desc: "You may not know this person, or you know them only socially or professionally — not in the context of building or contesting political power."
+    desc: "You don't know this person in a power-building context — or you only know them socially or professionally."
   },
   {
     value: 1,
-    label: "Shared policy interest / campaign",
-    desc: "Engaging around specific policy, programmatic, or campaign goals — working to determine the outcome of a contested decision."
+    label: "Shared policy interest or campaign",
+    desc: "Engaging around specific policy, programmatic, or campaign goals. Working to determine the outcome of a contested decision."
   },
   {
     value: 2,
     label: "Agenda-setting",
-    desc: "Shaping what issues and solutions are on the agenda, who has a seat at the table, and how decisions are made."
+    desc: "Shaping which issues and solutions are on the agenda, who has a seat at the table, and how decisions get made."
   },
   {
     value: 3,
-    label: "Co-conspirator (values / ideology)",
-    desc: "Reshaping how issues, constituencies, and solutions are understood — shifting narratives about what is just, legitimate, and possible."
+    label: "Co-conspirator (values, ideology)",
+    desc: "Reshaping how issues, constituencies, and solutions are understood. Shifting narratives about what is just, legitimate, and possible."
   }
 ];
 
@@ -467,7 +522,8 @@ const seedActors = () => ([
     faces: [1, 2],
     whyMatter: "Lead sponsor on the housing trust fund bill; key swing vote on budget.",
     notes: "Regular strategy calls during session. Co-developed last year's amendment package.",
-    gridX: 0.55, gridY: 0.55
+    scoreRationale: "Carried our housing bill through committee last cycle.",
+    gridX: 3, gridY: 3
   },
   {
     id: "a2",
@@ -479,7 +535,8 @@ const seedActors = () => ([
     faces: [1],
     whyMatter: "Controls implementation of the workforce equity rule we won in 2024.",
     notes: "Quarterly check-ins. Relationship is transactional but reliable.",
-    gridX: 0.2, gridY: 0.4
+    scoreRationale: "Quietly enforced our rule's intent against pushback from industry.",
+    gridX: 1, gridY: 2
   },
   {
     id: "a3",
@@ -491,7 +548,8 @@ const seedActors = () => ([
     faces: [1, 2, 3],
     whyMatter: "Anchor partner for the moral economy frame and door-to-door capacity.",
     notes: "Deepest peer alliance. Joint canvasses, shared narrative work, co-led last cycle's listening campaign.",
-    gridX: 0.8, gridY: 0.45
+    scoreRationale: "Turned out 1,200 congregants for the budget hearing.",
+    gridX: 4, gridY: 2
   },
   {
     id: "a4",
@@ -503,7 +561,8 @@ const seedActors = () => ([
     faces: [2, 3],
     whyMatter: "Convenes the statewide coalition table; controls comms war room.",
     notes: "Strategic alignment is strong. Less involved in our direct base work.",
-    gridX: 0.6, gridY: 0.35
+    scoreRationale: "Runs the coalition messaging that frames every legislative fight.",
+    gridX: 3, gridY: 2
   },
   {
     id: "a5",
@@ -515,7 +574,8 @@ const seedActors = () => ([
     faces: [2],
     whyMatter: "Connects us to caucus leadership; reads the legislative weather.",
     notes: "Informal, ad-hoc. Useful for intel and access, not for strategy.",
-    gridX: 0.25, gridY: -0.2
+    scoreRationale: "Brokered our first sit-down with the Speaker's chief of staff.",
+    gridX: 1, gridY: -1
   },
   {
     id: "a6",
@@ -527,7 +587,8 @@ const seedActors = () => ([
     faces: [1],
     whyMatter: "Chairs the committee where our budget asks live. Holds them up every cycle.",
     notes: "Hostile but reachable. Met twice last year — formal, transactional.",
-    gridX: -0.65, gridY: 0.75
+    scoreRationale: "Kept our line item out of last three budgets without explanation.",
+    gridX: -3, gridY: 4
   }
 ]);
 
@@ -537,6 +598,7 @@ function FaceSelect({ value, onChange }) {
   const toggle = (n) => {
     let next;
     if (n === 0) {
+      // 0 = no relationship — mutually exclusive with everything else
       next = value.includes(0) ? [] : [0];
     } else {
       const without = value.filter(v => v !== 0);
@@ -545,18 +607,24 @@ function FaceSelect({ value, onChange }) {
     onChange(next);
   };
   return (
-    <div className="faces-grid">
+    <div className="faces-grid" role="group" aria-label="Faces of power">
       {FACES.map(f => {
         const selected = value.includes(f.value);
         return (
-          <label key={f.value} className={"face-row" + (selected ? " selected" : "") + (f.value === 0 ? " zero" : "")}>
-            <input type="checkbox" checked={selected} onChange={() => toggle(f.value)} />
+          <div
+            key={f.value}
+            className={"face-row" + (selected ? " selected" : "") + (f.value === 0 ? " zero" : "")}
+            onClick={() => toggle(f.value)}
+            role="checkbox"
+            aria-checked={selected}
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggle(f.value); } }}
+            title={f.desc}
+          >
             <span className="face-num">{f.value}</span>
-            <span className="face-text">
-              <span className="face-label">{f.label}</span>
-              <span className="face-desc">{f.desc}</span>
-            </span>
-          </label>
+            <span className="face-label">{f.label}</span>
+            <span className="face-info" aria-hidden="true">i</span>
+          </div>
         );
       })}
     </div>
@@ -570,11 +638,12 @@ function MiniGridPicker({ x, y, color, onChange }) {
   const dragging = useRef(false);
   const update = (e) => {
     const r = ref.current.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width;
-    const py = (e.clientY - r.top) / r.height;
-    const nx = Math.max(-1, Math.min(1, px * 2 - 1));
-    const ny = Math.max(-1, Math.min(1, (1 - py) * 2 - 1));
-    onChange(Number(nx.toFixed(2)), Number(ny.toFixed(2)));
+    // Map cursor → -5..+5 with integer snap (round-to-nearest)
+    const px = (e.clientX - r.left) / r.width;   // 0..1
+    const py = (e.clientY - r.top) / r.height;   // 0..1
+    const rawX = px * (GRID_MAX - GRID_MIN) + GRID_MIN;       // -5..+5
+    const rawY = (1 - py) * (GRID_MAX - GRID_MIN) + GRID_MIN; // -5..+5
+    onChange(clampGrid(rawX), clampGrid(rawY));
   };
   const onDown = (e) => { dragging.current = true; update(e); e.preventDefault(); };
   const onMove = (e) => { if (dragging.current) update(e); };
@@ -587,27 +656,44 @@ function MiniGridPicker({ x, y, color, onChange }) {
       window.removeEventListener("mouseup", onUp);
     };
   }, []);
-  const leftPct = ((x + 1) / 2) * 100;
-  const topPct = ((1 - y) / 2) * 100;
-  const supportTxt = x === 0 ? "Neutral" : (x > 0 ? "Supporter +" : "Opponent ") + Math.abs(x).toFixed(2);
-  const powerTxt = y === 0 ? "Mid-power" : (y > 0 ? "Powerful +" : "Not powerful ") + Math.abs(y).toFixed(2);
+  // Position dot — center of integer "cell" on a -5..+5 grid
+  const ix = clampGrid(x);
+  const iy = clampGrid(y);
+  const leftPct = ((ix - GRID_MIN) / (GRID_MAX - GRID_MIN)) * 100;
+  const topPct  = ((GRID_MAX - iy) / (GRID_MAX - GRID_MIN)) * 100;
+
+  const supportTxt = ix === 0 ? "Neutral (0)" : (ix > 0 ? "+" + ix + " supporter" : ix + " opponent");
+  const powerTxt   = iy === 0 ? "Mid-range (0)" : (iy > 0 ? "+" + iy + " powerful" : iy + " not powerful");
+  const supportAnchor = anchorFor(SUPPORT_ANCHORS, ix).label;
+  const powerAnchor   = anchorFor(POWER_ANCHORS, iy).label;
+
+  // Tooltips with the full anchor scales (newline-joined). Native `title`.
+  const powerTooltip   = "Power axis (-5 to +5) — how much they can shape outcomes in this arena:\n\n"
+    + POWER_ANCHORS.map(a => (a.v >= 0 ? "+" + a.v : a.v) + "  " + a.label).join("\n");
+  const supportTooltip = "Support axis (-5 to +5) — where they stand on our agenda:\n\n"
+    + SUPPORT_ANCHORS.map(a => (a.v >= 0 ? "+" + a.v : a.v) + "  " + a.label).join("\n");
+
   return (
     <div>
       <div className="mini-grid-wrap">
         <div></div>
-        <div className="mini-grid-axis-lbl">Powerful</div>
+        <div className="mini-grid-axis-lbl" title={powerTooltip}>+5 Powerful</div>
         <div></div>
-        <div className="mini-grid-axis-lbl left">Opponent</div>
-        <div ref={ref} className="mini-grid" onMouseDown={onDown}>
+        <div className="mini-grid-axis-lbl left" title={supportTooltip}>−5 Opponent</div>
+        <div ref={ref} className="mini-grid" onMouseDown={onDown}
+             title="Click or drag to place. Whole numbers from −5 to +5 on each axis.">
           <div className="mini-grid-axes"></div>
           <div className="mini-grid-dot" style={{ left: leftPct + "%", top: topPct + "%", background: color }}></div>
         </div>
-        <div className="mini-grid-axis-lbl right">Supporter</div>
+        <div className="mini-grid-axis-lbl right" title={supportTooltip}>+5 Supporter</div>
         <div></div>
-        <div className="mini-grid-axis-lbl">Not powerful</div>
+        <div className="mini-grid-axis-lbl" title={powerTooltip}>−5 Not powerful</div>
         <div></div>
       </div>
-      <div className="grid-coord-readout">{supportTxt} · {powerTxt}</div>
+      <div className="grid-coord-readout">
+        {supportTxt} · {powerTxt}
+        <span className="anchor">{supportAnchor}. {powerAnchor}.</span>
+      </div>
     </div>
   );
 }
@@ -668,10 +754,6 @@ function ActorForm({ initial, onCommit, onCancel, submitLabel }) {
         </div>
       </div>
       <div className="field">
-        <label>Faces of power engaged</label>
-        <FaceSelect value={draft.faces} onChange={v => set("faces", v)} />
-      </div>
-      <div className="field">
         <label>Position on the power grid</label>
         <MiniGridPicker
           x={draft.gridX ?? 0}
@@ -683,7 +765,7 @@ function ActorForm({ initial, onCommit, onCancel, submitLabel }) {
       <div className="field">
         <label>
           Why this score?
-          <span style={{fontWeight:400, color:"var(--mute)", marginLeft:6, fontSize:11}}>One concrete example. Required.</span>
+          <span style={{fontWeight:400, color:"var(--mute)", marginLeft:6, fontSize:11, textTransform:"none", letterSpacing:0}}>One concrete example</span>
         </label>
         <input
           type="text"
@@ -691,6 +773,13 @@ function ActorForm({ initial, onCommit, onCancel, submitLabel }) {
           onChange={e => set("scoreRationale", e.target.value)}
           placeholder="e.g. led school board fight · blocked HB 21 in committee · shows up but never speaks"
         />
+      </div>
+      <div className="field">
+        <label>
+          Faces of power engaged
+          <span style={{fontWeight:400, color:"var(--mute)", marginLeft:6, fontSize:11, textTransform:"none", letterSpacing:0}}>Hover for definitions. Select one or more.</span>
+        </label>
+        <FaceSelect value={draft.faces} onChange={v => set("faces", v)} />
       </div>
       <div className="field">
         <label>Why this actor matters</label>
@@ -1016,13 +1105,20 @@ function PowerGrid({ actors, onUpdateActor }) {
   const plotSide = Math.max(200, Math.min(size.w - PAD_X * 2, size.h - PAD_Y * 2));
   const cx = size.w / 2, cy = size.h / 2;
   const half = plotSide / 2;
-  const xFor = (gx) => cx + gx * half;
-  const yFor = (gy) => cy - gy * half;
+  // Grid axis maps -5..+5 → pixel coords; integer snap everywhere.
+  const xFor = (gx) => cx + (gx / GRID_MAX) * half;
+  const yFor = (gy) => cy - (gy / GRID_MAX) * half;
   const fromPx = (px, py) => {
-    const gx = Math.max(-1, Math.min(1, (px - cx) / half));
-    const gy = Math.max(-1, Math.min(1, (cy - py) / half));
-    return [Number(gx.toFixed(2)), Number(gy.toFixed(2))];
+    const gxRaw = ((px - cx) / half) * GRID_MAX;
+    const gyRaw = ((cy - py) / half) * GRID_MAX;
+    return [clampGrid(gxRaw), clampGrid(gyRaw)];
   };
+
+  // Tooltip strings (full anchor scale) reused for axis-label hovers
+  const powerTooltip   = "Power axis (-5 to +5) — how much they can shape outcomes in this arena:\n\n"
+    + POWER_ANCHORS.map(a => (a.v >= 0 ? "+" + a.v : a.v) + "  " + a.label).join("\n");
+  const supportTooltip = "Support axis (-5 to +5) — where they stand on our agenda:\n\n"
+    + SUPPORT_ANCHORS.map(a => (a.v >= 0 ? "+" + a.v : a.v) + "  " + a.label).join("\n");
 
   const onDotDown = (e, actor) => {
     e.preventDefault(); e.stopPropagation();
@@ -1057,24 +1153,65 @@ function PowerGrid({ actors, onUpdateActor }) {
   return (
     <div ref={hostRef} className="grid-stage">
       <svg ref={svgRef} className="grid-svg" width={size.w} height={size.h} viewBox={`0 0 ${size.w} ${size.h}`}>
-        {/* plot background */}
+        {/* plot background — Groundwork white */}
         <rect x={cx - half} y={cy - half} width={plotSide} height={plotSide}
-              fill="#f5eedb" stroke="var(--rule)" strokeWidth="1" />
-        {/* quadrant subtle bg tints */}
-        <rect x={cx} y={cy - half} width={half} height={half} fill="rgba(19,48,107,0.025)" />
-        <rect x={cx - half} y={cy - half} width={half} height={half} fill="rgba(183,67,43,0.04)" />
-        <rect x={cx} y={cy} width={half} height={half} fill="rgba(107,122,58,0.04)" />
-        <rect x={cx - half} y={cy} width={half} height={half} fill="rgba(74,85,102,0.035)" />
+              fill="#ffffff" stroke="var(--rule)" strokeWidth="1" />
+        {/* quadrant subtle bg tints — all slate-gray, very faint, brand purple top-right */}
+        <rect x={cx} y={cy - half} width={half} height={half} fill="rgba(92,125,250,0.05)" />
+        <rect x={cx - half} y={cy - half} width={half} height={half} fill="rgba(24,24,27,0.025)" />
+        <rect x={cx} y={cy} width={half} height={half} fill="rgba(24,24,27,0.015)" />
+        <rect x={cx - half} y={cy} width={half} height={half} fill="rgba(24,24,27,0.025)" />
+
+        {/* integer grid lines (faint), at every whole-number step */}
+        {Array.from({length: GRID_MAX - GRID_MIN + 1}).map((_, i) => {
+          const v = GRID_MIN + i;
+          if (v === 0) return null;
+          const x = xFor(v), y = yFor(v);
+          return (
+            <g key={"tick" + i}>
+              <line x1={x} y1={cy - half} x2={x} y2={cy + half} stroke="var(--rule-soft)" strokeWidth="0.5" />
+              <line x1={cx - half} y1={y} x2={cx + half} y2={y} stroke="var(--rule-soft)" strokeWidth="0.5" />
+            </g>
+          );
+        })}
 
         {/* axes */}
         <line x1={cx - half} y1={cy} x2={cx + half} y2={cy} stroke="var(--rule)" strokeWidth="1" />
         <line x1={cx} y1={cy - half} x2={cx} y2={cy + half} stroke="var(--rule)" strokeWidth="1" />
 
-        {/* axis labels */}
-        <text className="grid-axis-label" x={cx} y={cy - half - 18} textAnchor="middle">Powerful</text>
-        <text className="grid-axis-label" x={cx} y={cy + half + 28} textAnchor="middle">Not powerful</text>
-        <text className="grid-axis-label" x={cx - half - 12} y={cy} textAnchor="end" dominantBaseline="middle">Opponent</text>
-        <text className="grid-axis-label" x={cx + half + 12} y={cy} textAnchor="start" dominantBaseline="middle">Supporter</text>
+        {/* integer scale labels */}
+        {[-5, -3, 3, 5].map(v => (
+          <text key={"xlbl" + v} className="grid-axis-label"
+                x={xFor(v)} y={cy + 16} textAnchor="middle"
+                style={{fill: "var(--mute)", fontSize: 10, letterSpacing: 0}}>
+            {v > 0 ? "+" + v : v}
+          </text>
+        ))}
+        {[-5, -3, 3, 5].map(v => (
+          <text key={"ylbl" + v} className="grid-axis-label"
+                x={cx - 8} y={yFor(v) + 4} textAnchor="end"
+                style={{fill: "var(--mute)", fontSize: 10, letterSpacing: 0}}>
+            {v > 0 ? "+" + v : v}
+          </text>
+        ))}
+
+        {/* axis labels (with native hover tooltips for the full anchor scale) */}
+        <text className="grid-axis-label" x={cx} y={cy - half - 18} textAnchor="middle" style={{cursor:"help"}}>
+          <title>{powerTooltip}</title>
+          Powerful (+5)
+        </text>
+        <text className="grid-axis-label" x={cx} y={cy + half + 28} textAnchor="middle" style={{cursor:"help"}}>
+          <title>{powerTooltip}</title>
+          Not powerful (−5)
+        </text>
+        <text className="grid-axis-label" x={cx - half - 12} y={cy} textAnchor="end" dominantBaseline="middle" style={{cursor:"help"}}>
+          <title>{supportTooltip}</title>
+          Opponent (−5)
+        </text>
+        <text className="grid-axis-label" x={cx + half + 12} y={cy} textAnchor="start" dominantBaseline="middle" style={{cursor:"help"}}>
+          <title>{supportTooltip}</title>
+          Supporter (+5)
+        </text>
 
         {/* quadrant strategy labels */}
         {quads.map((q, i) => (
@@ -1144,10 +1281,19 @@ function PowerGrid({ actors, onUpdateActor }) {
           <div className="tt-meta">{[tip.actor.title, tip.actor.organization].filter(Boolean).join(" · ")}</div>
           <div className="tt-meta">{lookupType(tip.actor.actorType).label} · {lookupConst(tip.actor.constituency).label}</div>
           <div className="tt-faces">
-            Grid: {(tip.actor.gridX ?? 0) >= 0 ? "Supporter +" : "Opponent "}{Math.abs(tip.actor.gridX ?? 0).toFixed(2)}
-            {" · "}
-            {(tip.actor.gridY ?? 0) >= 0 ? "Powerful +" : "Not powerful "}{Math.abs(tip.actor.gridY ?? 0).toFixed(2)}
+            {(() => {
+              const gx = clampGrid(tip.actor.gridX ?? 0);
+              const gy = clampGrid(tip.actor.gridY ?? 0);
+              const sLbl = gx === 0 ? "Neutral (0)" : (gx > 0 ? "+" + gx + " supporter" : gx + " opponent");
+              const pLbl = gy === 0 ? "Mid (0)"     : (gy > 0 ? "+" + gy + " powerful"  : gy + " not powerful");
+              return sLbl + " · " + pLbl;
+            })()}
           </div>
+          {tip.actor.scoreRationale && (
+            <div className="tt-faces" style={{fontStyle:"italic", color:"rgba(239,230,209,0.92)"}}>
+              "{tip.actor.scoreRationale}"
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -1206,8 +1352,8 @@ function App() {
     <div className="app">
       <header className="topbar">
         <div className="title-block">
-          <span className="wordmark">Power Mapping</span>
-          <span style={{display:"block", fontSize:11, color:"var(--mute)", marginTop:2, letterSpacing:".02em"}}>
+          <h1>Power Mapping Instrument</h1>
+          <span className="sub">
             Snapshot of where actors stand today. The grid will change over time.
           </span>
         </div>
@@ -1249,9 +1395,11 @@ function App() {
       <div className="pane-wrap">
         <aside className="left-pane">
 
-          <div style={{padding:"20px 20px 4px"}}>
-            <h1 style={{fontFamily:"var(--serif)", fontSize:22, fontWeight:400, margin:"0 0 4px"}}>Power Actors & Relationships</h1>
-            <p style={{fontFamily:"var(--serif)", fontSize:13, color:"var(--ink-2)", margin:"0 0 8px", lineHeight:1.5}}>
+          <div style={{padding:"22px 20px 8px"}}>
+            <h1 style={{fontFamily:"var(--display)", fontSize:24, fontWeight:700, letterSpacing:"-0.01em", margin:"0 0 6px", color:"var(--ink)"}}>
+              Power Actors & Relationships
+            </h1>
+            <p style={{fontFamily:"var(--sans)", fontSize:15, fontWeight:400, color:"var(--ink-2)", margin:"0 0 4px", lineHeight:1.5}}>
               A snapshot of who shapes your organization's ability to make progress on its goals — and how power is currently functioning in each relationship.
             </p>
           </div>
