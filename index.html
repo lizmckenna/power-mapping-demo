@@ -485,7 +485,11 @@ async function saveSnapshotToSupabase({ snapshotDate, filledOutBy, orgName, payl
       "Content-Type": "application/json",
       "apikey": SUPABASE_ANON_KEY,
       "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-      "Prefer": "return=representation",
+      // return=minimal: don't try to SELECT the row back after INSERT. Anon doesn't have
+      // a SELECT policy on this table (demo submissions are private — only authed GW
+      // users can read them), so return=representation triggers a misleading
+      // "violates RLS" error even though the INSERT itself succeeded.
+      "Prefer": "return=minimal",
     },
     body: JSON.stringify({
       snapshot_date: snapshotDate,
@@ -499,7 +503,8 @@ async function saveSnapshotToSupabase({ snapshotDate, filledOutBy, orgName, payl
     const text = await res.text();
     throw new Error(`Supabase ${res.status}: ${text}`);
   }
-  return await res.json();
+  // return=minimal yields an empty body; nothing to parse
+  return null;
 }
 
 /* ========= Static config ========= */
