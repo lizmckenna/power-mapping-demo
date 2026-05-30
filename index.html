@@ -66,8 +66,9 @@
   .wordmark .dot { color: var(--cobalt); margin: 0 6px; }
   .title-block { display: flex; flex-direction: column; gap: 4px; }
   .title-block h1 {
-    font-family: var(--display); font-weight: 700; font-size: 22px;
-    margin: 0; color: var(--ink); letter-spacing: -0.01em;
+    font-family: var(--display); font-weight: 700; font-size: 30px;
+    margin: 0; color: var(--ink); letter-spacing: -0.015em;
+    line-height: 1.05;
   }
   .title-block .sub {
     font-family: var(--sans); font-size: 13px; color: var(--mute);
@@ -320,38 +321,22 @@
     position: absolute; top: 41px; left: 0; right: 0; bottom: 0;
   }
 
-  /* Horizontal key strip — sits below tabs, above the plot, never overlaps */
-  .key-strip {
-    position: absolute; top: 41px; left: 0; right: 0; z-index: 2;
-    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
-    padding: 10px 20px;
-    background: var(--paper);
-    border-bottom: 1px solid var(--rule-soft);
-    font-family: var(--sans); font-size: 11.5px; color: var(--mute);
+  /* Grid bottom legend — two boxes side by side, network-map aesthetic */
+  .grid-legends {
+    position: absolute; left: 18px; bottom: 18px; z-index: 2;
+    display: flex; gap: 12px; align-items: flex-end;
+    pointer-events: none;
   }
-  .key-strip .key-group { display: flex; align-items: center; gap: 8px; }
-  .key-strip .key-label {
-    font-family: var(--sans); font-size: 11px; font-weight: 600;
-    color: var(--ink-2); letter-spacing: 0;
-    margin-right: 2px;
+  .grid-legends .legend {
+    /* re-use .legend look (white box, border, padding) but no absolute positioning here */
+    position: static;
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 12px 14px;
+    max-width: 240px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
   }
-  .key-strip .key-item {
-    display: inline-flex; align-items: center; gap: 5px;
-    color: var(--ink-2);
-  }
-  .key-strip .key-swatch {
-    width: 10px; height: 10px; border-radius: 50%;
-    border: 1px solid rgba(0,0,0,0.1);
-  }
-  .key-strip .key-size {
-    background: var(--cobalt); border-radius: 50%;
-    border: 1px solid rgba(0,0,0,0.1);
-  }
-  .key-strip-divider {
-    width: 1px; height: 18px; background: var(--rule);
-  }
-  /* When key strip is present, push the plot down */
-  .view-host.with-key { top: 78px; }
 
   /* ===== Power grid ===== */
   .grid-stage {
@@ -1472,40 +1457,14 @@ function App() {
       <div className="pane-wrap">
         <aside className="left-pane">
 
-          <div style={{padding:"22px 20px 8px"}}>
-            <h1 style={{fontFamily:"var(--display)", fontSize:24, fontWeight:700, letterSpacing:"-0.01em", margin:"0 0 6px", color:"var(--ink)"}}>
+          <div style={{padding:"18px 20px 8px"}}>
+            <h2 style={{fontFamily:"var(--display)", fontSize:17, fontWeight:600, letterSpacing:"-0.005em", margin:"0 0 5px", color:"var(--ink)"}}>
               Power Actors & Relationships
-            </h1>
-            <p style={{fontFamily:"var(--sans)", fontSize:15, fontWeight:400, color:"var(--ink-2)", margin:"0 0 4px", lineHeight:1.5}}>
-              A snapshot of who shapes your organization's ability to make progress on its goals, and how power is currently functioning in each relationship.
+            </h2>
+            <p style={{fontFamily:"var(--sans)", fontSize:12.5, fontWeight:400, color:"var(--ink-2)", margin:"0 0 4px", lineHeight:1.5}}>
+              A snapshot of who shapes your organization's ability to make progress on its goals, and how power is currently functioning in each relationship. The Network view uses each actor's highest selected face of power as the tie strength in the SNA.
             </p>
           </div>
-
-          <section className="section">
-            <div className="section-header" onClick={() => setOrgOpen(o => !o)}>
-              <h2>Organization & respondents</h2>
-              <span className="caret">{orgOpen ? "−" : "+"}</span>
-            </div>
-            {orgOpen && (
-              <div className="section-body">
-                <div className="field">
-                  <label>Organization name</label>
-                  <input value={org.orgName} onChange={e => setOrg({...org, orgName: e.target.value})} />
-                </div>
-                <div className="field-row">
-                  <div className="field">
-                    <label>Date</label>
-                    <input type="date" value={org.date} onChange={e => setOrg({...org, date: e.target.value})} />
-                  </div>
-                  <div className="field">
-                    <label>Participants</label>
-                    <input value={org.participants} onChange={e => setOrg({...org, participants: e.target.value})} placeholder="Roles in attendance" />
-                  </div>
-                </div>
-                <p className="note-line">The org sits at the center of the map. Its name renders as the ego node label.</p>
-              </div>
-            )}
-          </section>
 
           <section className="section">
             <div className="section-header" onClick={() => setAddOpen(o => !o)}>
@@ -1539,6 +1498,22 @@ function App() {
             )}
           </section>
 
+          <section className="section">
+            <div className="section-header" onClick={() => setOrgOpen(o => !o)}>
+              <h2>Your organization (for the network map)</h2>
+              <span className="caret">{orgOpen ? "−" : "+"}</span>
+            </div>
+            {orgOpen && (
+              <div className="section-body">
+                <div className="field">
+                  <label>Organization name</label>
+                  <input value={org.orgName} onChange={e => setOrg({...org, orgName: e.target.value})} />
+                </div>
+                <p className="note-line">The org sits at the center of the Network view. Its name renders as the ego node label. Date + filled-out-by are captured in the top bar.</p>
+              </div>
+            )}
+          </section>
+
         </aside>
 
         <main className="right-pane">
@@ -1547,35 +1522,35 @@ function App() {
             <button className={"tab" + (view === "network" ? " active" : "")} onClick={() => setView("network")}>Network</button>
           </div>
 
-          {view === "grid" && (
-            <div className="key-strip">
-              <div className="key-group">
-                <span className="key-label">Actor type</span>
-                {ACTOR_TYPES.map(t => (
-                  <span key={t.value} className="key-item">
-                    <span className="key-swatch" style={{background: t.color}}></span>
-                    {t.label}
-                  </span>
-                ))}
-              </div>
-              <span className="key-strip-divider"></span>
-              <div className="key-group">
-                <span className="key-label">Bubble size</span>
-                {CONSTITUENCY.map(c => (
-                  <span key={c.value} className="key-item">
-                    <span className="key-size" style={{width: c.radius * 0.55, height: c.radius * 0.55}}></span>
-                    {c.label}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className={"view-host" + (view === "grid" ? " with-key" : "")}>
+          <div className="view-host">
             {view === "network"
               ? <NetworkMap org={org} actors={actors} />
               : <PowerGrid actors={actors} onUpdateActor={updateActor} />}
           </div>
+
+          {view === "grid" && (
+            <div className="grid-legends">
+              <div className="legend">
+                <h3>Actor type</h3>
+                {ACTOR_TYPES.map(t => (
+                  <div className="item" key={t.value}>
+                    <span className="swatch" style={{background: t.color}}></span>
+                    <span>{t.label}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="legend">
+                <h3>Bubble size</h3>
+                {CONSTITUENCY.map(c => (
+                  <div className="item" key={c.value}>
+                    <span className="swatch size-swatch"
+                          style={{width: c.radius * 0.6, height: c.radius * 0.6, background: "var(--mute)"}}></span>
+                    <span>{c.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </main>
       </div>
     </div>
