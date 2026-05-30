@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Power Actors & Relationships — Civic Power Lab</title>
+<title>Power Actors & Relationships · Civic Power Lab</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -127,20 +127,26 @@
   }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-  /* Faces of power — clean toggle rows, no checkbox visuals */
+  /* Faces of power — clean toggle rows + click-to-expand definition */
   .faces-grid { display: flex; flex-direction: column; gap: 4px; }
   .face-row {
     position: relative;
     display: flex; align-items: center; gap: 10px;
     padding: 9px 12px;
     border: 1px solid var(--rule); border-radius: 4px;
-    background: var(--paper); cursor: pointer;
+    background: var(--paper);
     transition: background 0.12s, border-color 0.12s;
     user-select: none;
   }
-  .face-row:hover { border-color: var(--cobalt-soft); background: var(--paper-tint); }
   .face-row.selected { background: rgba(92,125,250,0.08); border-color: var(--cobalt); }
   .face-row.zero.selected { background: var(--cream-2); border-color: var(--mute); }
+  .face-toggle {
+    flex: 1;
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer;
+    min-width: 0;
+  }
+  .face-toggle:hover .face-label { color: var(--cobalt); }
   .face-row .face-num {
     font-family: var(--sans); font-size: 13px; font-weight: 600;
     color: var(--mute); width: 16px; flex-shrink: 0; line-height: 1;
@@ -151,13 +157,32 @@
     flex: 1;
     font-family: var(--sans); font-weight: 500; font-size: 13px; color: var(--ink);
     line-height: 1.3; letter-spacing: 0;
+    transition: color 0.12s;
   }
-  .face-row .face-info {
-    font-family: var(--sans); font-size: 11px; color: var(--mute);
-    flex-shrink: 0; opacity: 0.7;
+  .face-info-btn {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: var(--cobalt);
+    color: var(--paper);
+    font-family: var(--display); font-size: 12px; font-weight: 700;
+    border: none; cursor: pointer; padding: 0;
+    transition: background 0.12s, transform 0.12s;
   }
-  .face-row:hover .face-info { opacity: 1; color: var(--cobalt); }
-  /* Native tooltip styling — browsers handle `title` attr; can't restyle, but the content is plain sentence-case sans-serif */
+  .face-info-btn:hover { background: var(--cobalt-deep); }
+  .face-info-btn.open { background: var(--ink); transform: rotate(45deg); }
+  .face-desc {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 8px; padding: 10px 12px;
+    background: var(--paper-tint);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    font-family: var(--sans); font-size: 12.5px; line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .face-row-wrap { display: flex; flex-direction: column; }
 
   /* Buttons */
   .btn {
@@ -295,6 +320,39 @@
     position: absolute; top: 41px; left: 0; right: 0; bottom: 0;
   }
 
+  /* Horizontal key strip — sits below tabs, above the plot, never overlaps */
+  .key-strip {
+    position: absolute; top: 41px; left: 0; right: 0; z-index: 2;
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    padding: 10px 20px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule-soft);
+    font-family: var(--sans); font-size: 11.5px; color: var(--mute);
+  }
+  .key-strip .key-group { display: flex; align-items: center; gap: 8px; }
+  .key-strip .key-label {
+    font-family: var(--sans); font-size: 11px; font-weight: 600;
+    color: var(--ink-2); letter-spacing: 0;
+    margin-right: 2px;
+  }
+  .key-strip .key-item {
+    display: inline-flex; align-items: center; gap: 5px;
+    color: var(--ink-2);
+  }
+  .key-strip .key-swatch {
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  .key-strip .key-size {
+    background: var(--cobalt); border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  .key-strip-divider {
+    width: 1px; height: 18px; background: var(--rule);
+  }
+  /* When key strip is present, push the plot down */
+  .view-host.with-key { top: 78px; }
+
   /* ===== Power grid ===== */
   .grid-stage {
     width: 100%; height: 100%;
@@ -304,12 +362,12 @@
   }
   .grid-svg { max-width: 100%; max-height: 100%; cursor: default; }
   .grid-quad-label {
-    font-family: var(--mono); font-size: 9.5px; font-weight: 500;
-    letter-spacing: 0.14em; text-transform: uppercase; fill: var(--mute);
+    font-family: var(--mono); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase; fill: var(--cobalt);
   }
   .grid-quad-strategy {
-    font-family: var(--serif); font-size: 12px; font-style: italic;
-    fill: var(--ink-2);
+    font-family: var(--display); font-size: 15px; font-weight: 600;
+    fill: var(--ink); letter-spacing: -0.005em;
   }
   .grid-axis-label {
     font-family: var(--mono); font-size: 10px; font-weight: 500;
@@ -420,36 +478,37 @@ const GRID_MIN = -5;
 const GRID_MAX = 5;
 const clampGrid = (n) => Math.max(GRID_MIN, Math.min(GRID_MAX, Math.round(n)));
 
-// Behavioral anchors for hover/help text.
-// Power axis: Joy / Miya scale (7 named anchors at -5/-3/-1/0/+1/+3/+5,
-// in-between values interpolate). Labels are normative — every cell still accepts a value.
+// Behavioral anchors. Format: { bold: lead descriptor, body: comma-flowing qualifiers (no internal periods) }.
+// Power axis: Joy / Miya 7-point scale. Named anchors at -5/-3/-1/0/+1/+3/+5; in-between values interpolate.
 const POWER_ANCHORS = [
-  { v:  5, label: "Dominant in the arena. Can consistently shape major outcomes across issues." },
-  { v:  4, label: "Between +3 and +5." },
-  { v:  3, label: "Strong proactive capacity. Can pass priority items or reshape major debates." },
-  { v:  2, label: "Between +1 and +3." },
-  { v:  1, label: "Emerging proactive capacity. Can shape outcomes on narrow issues." },
-  { v:  0, label: "Can reliably defend its interests but can't yet advance an agenda." },
-  { v: -1, label: "Has some defensive footing but can be overrun under pressure." },
-  { v: -2, label: "Between -3 and -1." },
-  { v: -3, label: "Limited defensive capacity. Can occasionally resist harm." },
-  { v: -4, label: "Between -5 and -3." },
-  { v: -5, label: "No meaningful power. Fully subject to others." },
+  { v:  5, bold: "Dominant in the arena",            body: "consistently shapes major outcomes across issues" },
+  { v:  4, bold: "Between +3 and +5",                body: "" },
+  { v:  3, bold: "Strong proactive capacity",        body: "can pass priority items or reshape major debates" },
+  { v:  2, bold: "Between +1 and +3",                body: "" },
+  { v:  1, bold: "Emerging proactive capacity",      body: "can shape outcomes on narrow issues" },
+  { v:  0, bold: "Holds the line",                   body: "can reliably defend its interests but can't yet advance an agenda" },
+  { v: -1, bold: "Defensive footing",                body: "has some standing but can be overrun under pressure" },
+  { v: -2, bold: "Between -3 and -1",                body: "" },
+  { v: -3, bold: "Limited defensive capacity",       body: "can occasionally resist harm" },
+  { v: -4, bold: "Between -5 and -3",                body: "" },
+  { v: -5, bold: "No meaningful power",              body: "fully subject to others" },
 ];
 const SUPPORT_ANCHORS = [
-  { v:  5, label: "Aligned champion — leads on our priorities, takes risks for them" },
-  { v:  4, label: "Strong supporter — reliable yes, will spend political capital" },
-  { v:  3, label: "Supporter — votes or acts with us when it matters" },
-  { v:  2, label: "Moderate supporter — mostly with us, hedges on hard asks" },
-  { v:  1, label: "Soft supporter — sympathetic, low effort" },
-  { v:  0, label: "Neutral or persuadable — undecided or uninvolved" },
-  { v: -1, label: "Soft opponent — leans against, low effort" },
-  { v: -2, label: "Moderate opponent — usually against us, will still dialogue" },
-  { v: -3, label: "Opponent — opposes most asks, will block when possible" },
-  { v: -4, label: "Strong opponent — actively organizes against us" },
-  { v: -5, label: "Implacable adversary — treats our success as their loss" },
+  { v:  5, bold: "Aligned champion",        body: "leads on our priorities, takes risks for them" },
+  { v:  4, bold: "Strong supporter",        body: "reliable yes, will spend political capital" },
+  { v:  3, bold: "Supporter",               body: "votes or acts with us when it matters" },
+  { v:  2, bold: "Moderate supporter",      body: "mostly with us, hedges on hard asks" },
+  { v:  1, bold: "Soft supporter",          body: "sympathetic, low effort" },
+  { v:  0, bold: "Neutral or persuadable",  body: "undecided or uninvolved" },
+  { v: -1, bold: "Soft opponent",           body: "leans against, low effort" },
+  { v: -2, bold: "Moderate opponent",       body: "usually against us, willing to dialogue" },
+  { v: -3, bold: "Opponent",                body: "opposes most asks, will block when possible" },
+  { v: -4, bold: "Strong opponent",         body: "actively organizes against us" },
+  { v: -5, bold: "Implacable adversary",    body: "treats our success as their loss" },
 ];
 const anchorFor = (arr, v) => arr.find(a => a.v === v) || arr[Math.floor(arr.length/2)];
+// Plain-text formatter used in native SVG/HTML `title` tooltips (no bold available there).
+const anchorText = (a) => a.body ? a.bold + ": " + a.body : a.bold;
 
 
 // Groundwork-aligned categorical palette — clean, white-bg legible, harmonious with --cobalt
@@ -471,7 +530,7 @@ const FACES = [
   {
     value: 0,
     label: "No relationship",
-    desc: "You don't know this person in a power-building context — or you only know them socially or professionally."
+    desc: "You don't know this person in a power-building context, or you only know them socially or professionally."
   },
   {
     value: 1,
@@ -588,7 +647,7 @@ const seedActors = () => ([
     constituency: "mass",
     faces: [1],
     whyMatter: "Chairs the committee where our budget asks live. Holds them up every cycle.",
-    notes: "Hostile but reachable. Met twice last year — formal, transactional.",
+    notes: "Hostile but reachable. Met twice last year, formal and transactional.",
     scoreRationale: "Kept our line item out of last three budgets without explanation.",
     gridX: -3, gridY: 4
   }
@@ -597,10 +656,11 @@ const seedActors = () => ([
 /* ========= Faces multi-select ========= */
 
 function FaceSelect({ value, onChange }) {
+  const [expanded, setExpanded] = useState(null); // which face's definition is open
   const toggle = (n) => {
     let next;
     if (n === 0) {
-      // 0 = no relationship — mutually exclusive with everything else
+      // 0 = no relationship, mutually exclusive with everything else
       next = value.includes(0) ? [] : [0];
     } else {
       const without = value.filter(v => v !== 0);
@@ -608,24 +668,40 @@ function FaceSelect({ value, onChange }) {
     }
     onChange(next);
   };
+  const toggleExpand = (n, e) => {
+    e.stopPropagation();
+    setExpanded(prev => prev === n ? null : n);
+  };
   return (
     <div className="faces-grid" role="group" aria-label="Faces of power">
       {FACES.map(f => {
         const selected = value.includes(f.value);
+        const isOpen = expanded === f.value;
         return (
-          <div
-            key={f.value}
-            className={"face-row" + (selected ? " selected" : "") + (f.value === 0 ? " zero" : "")}
-            onClick={() => toggle(f.value)}
-            role="checkbox"
-            aria-checked={selected}
-            tabIndex={0}
-            onKeyDown={(e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggle(f.value); } }}
-            title={f.desc}
-          >
-            <span className="face-num">{f.value}</span>
-            <span className="face-label">{f.label}</span>
-            <span className="face-info" aria-hidden="true">i</span>
+          <div key={f.value} className="face-row-wrap">
+            <div
+              className={"face-row" + (selected ? " selected" : "") + (f.value === 0 ? " zero" : "")}
+            >
+              <div
+                className="face-toggle"
+                onClick={() => toggle(f.value)}
+                role="checkbox"
+                aria-checked={selected}
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggle(f.value); } }}
+              >
+                <span className="face-num">{f.value}</span>
+                <span className="face-label">{f.label}</span>
+              </div>
+              <button
+                type="button"
+                className={"face-info-btn" + (isOpen ? " open" : "")}
+                onClick={(e) => toggleExpand(f.value, e)}
+                aria-label={isOpen ? "Hide definition" : "Show definition"}
+                title="Show definition"
+              >+</button>
+            </div>
+            {isOpen && <div className="face-desc">{f.desc}</div>}
           </div>
         );
       })}
@@ -664,16 +740,16 @@ function MiniGridPicker({ x, y, color, onChange }) {
   const leftPct = ((ix - GRID_MIN) / (GRID_MAX - GRID_MIN)) * 100;
   const topPct  = ((GRID_MAX - iy) / (GRID_MAX - GRID_MIN)) * 100;
 
-  const supportTxt = ix === 0 ? "Neutral (0)" : (ix > 0 ? "+" + ix + " supporter" : ix + " opponent");
-  const powerTxt   = iy === 0 ? "Mid-range (0)" : (iy > 0 ? "+" + iy + " powerful" : iy + " not powerful");
-  const supportAnchor = anchorFor(SUPPORT_ANCHORS, ix).label;
-  const powerAnchor   = anchorFor(POWER_ANCHORS, iy).label;
+  const supportTxt = ix === 0 ? "0" : (ix > 0 ? "+" + ix : "" + ix);
+  const powerTxt   = iy === 0 ? "0" : (iy > 0 ? "+" + iy : "" + iy);
+  const sA = anchorFor(SUPPORT_ANCHORS, ix);
+  const pA = anchorFor(POWER_ANCHORS, iy);
 
-  // Tooltips with the full anchor scales (newline-joined). Native `title`.
-  const powerTooltip   = "Power axis (-5 to +5) — how much they can shape outcomes in this arena:\n\n"
-    + POWER_ANCHORS.map(a => (a.v >= 0 ? "+" + a.v : a.v) + "  " + a.label).join("\n");
-  const supportTooltip = "Support axis (-5 to +5) — where they stand on our agenda:\n\n"
-    + SUPPORT_ANCHORS.map(a => (a.v >= 0 ? "+" + a.v : a.v) + "  " + a.label).join("\n");
+  // Tooltips with the full anchor scales (newline-joined). Native `title` — plain text only.
+  const powerTooltip   = "Power axis (-5 to +5), how much they can shape outcomes:\n\n"
+    + POWER_ANCHORS.map(a => (a.v >= 0 ? "+" + a.v : a.v) + "  " + anchorText(a)).join("\n");
+  const supportTooltip = "Support axis (-5 to +5), where they stand on our agenda:\n\n"
+    + SUPPORT_ANCHORS.map(a => (a.v >= 0 ? "+" + a.v : a.v) + "  " + anchorText(a)).join("\n");
 
   return (
     <div>
@@ -693,8 +769,11 @@ function MiniGridPicker({ x, y, color, onChange }) {
         <div></div>
       </div>
       <div className="grid-coord-readout">
-        {supportTxt} · {powerTxt}
-        <span className="anchor">{supportAnchor}. {powerAnchor}.</span>
+        Support {supportTxt} · Power {powerTxt}
+        <span className="anchor">
+          <strong>{sA.bold}</strong>{sA.body ? ", " + sA.body : ""}
+          {pA.body ? ", " + pA.bold.toLowerCase() + ", " + pA.body : (pA.bold !== sA.bold ? ", " + pA.bold.toLowerCase() : "")}.
+        </span>
       </div>
     </div>
   );
@@ -764,20 +843,25 @@ function ActorForm({ initial, onCommit, onCancel, submitLabel }) {
           onChange={(nx, ny) => setDraft(d => ({ ...d, gridX: nx, gridY: ny }))}
         />
       </div>
-      <div className="field">
-        <label>
-          Why this score? Give one concrete example.
-          <span style={{fontWeight:400, color:"var(--mute)", marginLeft:6, fontSize:11, textTransform:"none", letterSpacing:0}}>
-            Anchor: {anchorFor(POWER_ANCHORS, clampGrid(draft.gridY ?? 0)).label}
-          </span>
-        </label>
-        <input
-          type="text"
-          value={draft.scoreRationale}
-          onChange={e => set("scoreRationale", e.target.value)}
-          placeholder="e.g. led the school board fight · blocked HB 21 in committee · shows up but never speaks"
-        />
-      </div>
+      {(() => {
+        const pa = anchorFor(POWER_ANCHORS, clampGrid(draft.gridY ?? 0));
+        return (
+          <div className="field">
+            <label>
+              Why this score? Give one concrete example.
+              <span style={{fontWeight:400, color:"var(--mute)", display:"block", marginTop:4, fontSize:11.5, textTransform:"none", letterSpacing:0, lineHeight:1.4}}>
+                Power anchor: <strong style={{color:"var(--ink-2)", fontWeight:600}}>{pa.bold}</strong>{pa.body ? ", " + pa.body : ""}.
+              </span>
+            </label>
+            <input
+              type="text"
+              value={draft.scoreRationale}
+              onChange={e => set("scoreRationale", e.target.value)}
+              placeholder="e.g. led the school board fight, blocked HB 21 in committee, shows up but never speaks"
+            />
+          </div>
+        );
+      })()}
       <div className="field">
         <label>
           Faces of power engaged
@@ -812,7 +896,7 @@ function ActorCard({ actor, onUpdate, onDelete }) {
   const [editing, setEditing] = useState(false);
   const t = lookupType(actor.actorType);
   const hf = highestFace(actor.faces);
-  const facesStr = (!actor.faces || actor.faces.length === 0) ? "— faces unset" :
+  const facesStr = (!actor.faces || actor.faces.length === 0) ? "Faces unset" :
                    actor.faces.includes(0) ? "Face 0" :
                    "Faces " + actor.faces.join(", ");
   return (
@@ -1076,7 +1160,7 @@ function NetworkMap({ org, actors }) {
           <div className="tt-meta">{lookupType(tip.actor.actorType).label} · {lookupConst(tip.actor.constituency).label}</div>
           <div className="tt-faces">
             {tip.actor.faces && tip.actor.faces.length
-              ? (tip.actor.faces.includes(0) ? "Face 0 — No power relationship" : "Faces " + tip.actor.faces.join(", "))
+              ? (tip.actor.faces.includes(0) ? "Face 0: no power relationship" : "Faces " + tip.actor.faces.join(", "))
               : "Faces unset"}
           </div>
         </div>
@@ -1119,10 +1203,10 @@ function PowerGrid({ actors, onUpdateActor }) {
   };
 
   // Tooltip strings (full anchor scale) reused for axis-label hovers
-  const powerTooltip   = "Power axis (-5 to +5) — how much they can shape outcomes in this arena:\n\n"
-    + POWER_ANCHORS.map(a => (a.v >= 0 ? "+" + a.v : a.v) + "  " + a.label).join("\n");
-  const supportTooltip = "Support axis (-5 to +5) — where they stand on our agenda:\n\n"
-    + SUPPORT_ANCHORS.map(a => (a.v >= 0 ? "+" + a.v : a.v) + "  " + a.label).join("\n");
+  const powerTooltip   = "Power axis (-5 to +5), how much they can shape outcomes:\n\n"
+    + POWER_ANCHORS.map(a => (a.v >= 0 ? "+" + a.v : a.v) + "  " + anchorText(a)).join("\n");
+  const supportTooltip = "Support axis (-5 to +5), where they stand on our agenda:\n\n"
+    + SUPPORT_ANCHORS.map(a => (a.v >= 0 ? "+" + a.v : a.v) + "  " + anchorText(a)).join("\n");
 
   const onDotDown = (e, actor) => {
     e.preventDefault(); e.stopPropagation();
@@ -1264,18 +1348,6 @@ function PowerGrid({ actors, onUpdateActor }) {
         })}
       </svg>
 
-      <div className="legend" style={{top: 18, right: 18}}>
-        <h3>Quadrants (Cushman, 2014/2023)</h3>
-        <div className="item"><span style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--cobalt)",width:14}}>1</span><span>Organize a base — lower right</span></div>
-        <div className="item"><span style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--cobalt)",width:14}}>2</span><span>Divide & neutralize — upper left</span></div>
-        <div className="item"><span style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--cobalt)",width:14}}>3</span><span>Engage & redirect — upper right</span></div>
-        <div className="item"><span style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--cobalt)",width:14}}>4</span><span>Disorganize / reorganize — lower left</span></div>
-        <h3>Tip</h3>
-        <div className="item" style={{fontSize: 11, fontStyle:"italic", color:"var(--mute)"}}>
-          Drag any dot to reposition. Edit in the form for precise coords.
-        </div>
-      </div>
-
       {tip && tip.actor && (
         <div className="map-tooltip" style={{
           left: Math.min(tip.x + 14, size.w - 270),
@@ -1404,7 +1476,7 @@ function App() {
               Power Actors & Relationships
             </h1>
             <p style={{fontFamily:"var(--sans)", fontSize:15, fontWeight:400, color:"var(--ink-2)", margin:"0 0 4px", lineHeight:1.5}}>
-              A snapshot of who shapes your organization's ability to make progress on its goals — and how power is currently functioning in each relationship.
+              A snapshot of who shapes your organization's ability to make progress on its goals, and how power is currently functioning in each relationship.
             </p>
           </div>
 
@@ -1466,9 +1538,6 @@ function App() {
             )}
           </section>
 
-          <div className="footer-hint">
-            Mockup for methodology review — not a production instrument (yet).
-          </div>
         </aside>
 
         <main className="right-pane">
@@ -1476,7 +1545,32 @@ function App() {
             <button className={"tab" + (view === "grid" ? " active" : "")} onClick={() => setView("grid")}>Power grid</button>
             <button className={"tab" + (view === "network" ? " active" : "")} onClick={() => setView("network")}>Network</button>
           </div>
-          <div className="view-host">
+
+          {view === "grid" && (
+            <div className="key-strip">
+              <div className="key-group">
+                <span className="key-label">Actor type</span>
+                {ACTOR_TYPES.map(t => (
+                  <span key={t.value} className="key-item">
+                    <span className="key-swatch" style={{background: t.color}}></span>
+                    {t.label}
+                  </span>
+                ))}
+              </div>
+              <span className="key-strip-divider"></span>
+              <div className="key-group">
+                <span className="key-label">Bubble size</span>
+                {CONSTITUENCY.map(c => (
+                  <span key={c.value} className="key-item">
+                    <span className="key-size" style={{width: c.radius * 0.55, height: c.radius * 0.55}}></span>
+                    {c.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className={"view-host" + (view === "grid" ? " with-key" : "")}>
             {view === "network"
               ? <NetworkMap org={org} actors={actors} />
               : <PowerGrid actors={actors} onUpdateActor={updateActor} />}
