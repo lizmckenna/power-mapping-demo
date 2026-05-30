@@ -7,37 +7,42 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=Work+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Archivo+Narrow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
   :root {
-    --paper: #efe6d1;
-    --paper-tint: #f5eedb;
-    --cream-2: #e6dcc2;
-    --rule: #cec2a8;
-    --rule-soft: #ddd2b6;
-    --ink: #171514;
-    --ink-2: #332f2b;
-    --mute: #6a6256;
-    --cobalt: #13306b;
-    --cobalt-deep: #0a204e;
-    --cobalt-soft: #4a6396;
+    /* Groundwork / Linear-aesthetic palette */
+    --paper: #ffffff;
+    --paper-tint: #fafafa;
+    --cream-2: #f4f4f5;
+    --rule: #e4e4e7;
+    --rule-soft: #f0f0f3;
+    --ink: #18181b;
+    --ink-2: #27272a;
+    --mute: #71717a;
+    /* Brand purple replaces cobalt */
+    --cobalt: #5c7dfa;
+    --cobalt-deep: #3e4f6e;
+    --cobalt-soft: #c5d0fc;
+    /* Actor-category accents — kept harmonious with brand purple */
     --terracotta: #b7432b;
-    --terracotta-soft: #d2735d;
-    --olive: #6b7a3a;
-    --amber: #c89342;
-    --slate: #4a5566;
-    --ego: #0d3d45;
-    --serif: "Source Serif 4", Georgia, serif;
-    --sans: "Work Sans", -apple-system, system-ui, sans-serif;
+    --terracotta-soft: #f4d3cb;
+    --olive: #5b7a3a;
+    --amber: #c99633;
+    --slate: #475569;
+    --ego: #0d6b5a;
+    --display: "Archivo Narrow", -apple-system, system-ui, sans-serif;
+    --sans: "DM Sans", -apple-system, system-ui, sans-serif;
     --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    /* Legacy alias so existing rules using var(--serif) still work — falls back to display */
+    --serif: var(--display);
   }
 
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
   body {
     font-family: var(--sans);
-    font-weight: 300;
+    font-weight: 400;
     background: var(--paper);
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
@@ -612,6 +617,7 @@ function ActorForm({ initial, onCommit, onCancel, submitLabel }) {
     name: "", title: "", organization: "",
     actorType: "elected", constituency: "organized",
     faces: [], whyMatter: "", notes: "",
+    scoreRationale: "", // why this grid position? concrete behavior expected
     gridX: 0, gridY: 0
   };
   const [draft, setDraft] = useState(initial || blank);
@@ -672,6 +678,18 @@ function ActorForm({ initial, onCommit, onCancel, submitLabel }) {
           y={draft.gridY ?? 0}
           color={lookupType(draft.actorType).color}
           onChange={(nx, ny) => setDraft(d => ({ ...d, gridX: nx, gridY: ny }))}
+        />
+      </div>
+      <div className="field">
+        <label>
+          Why this score?
+          <span style={{fontWeight:400, color:"var(--mute)", marginLeft:6, fontSize:11}}>One concrete example. Required.</span>
+        </label>
+        <input
+          type="text"
+          value={draft.scoreRationale}
+          onChange={e => set("scoreRationale", e.target.value)}
+          placeholder="e.g. led school board fight · blocked HB 21 in committee · shows up but never speaks"
         />
       </div>
       <div className="field">
@@ -1144,7 +1162,11 @@ function App() {
   const [orgOpen, setOrgOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(true);
   const [listOpen, setListOpen] = useState(true);
-  const [view, setView] = useState("network");
+  const [view, setView] = useState("grid"); // power grid is the default — most familiar to organizers
+  // Snapshot metadata — explicit so cross-snapshot deltas have a baseline
+  const today = new Date().toISOString().slice(0, 10);
+  const [snapshotDate, setSnapshotDate] = useState(today);
+  const [filledOutBy, setFilledOutBy] = useState("");
 
   const addActor = useCallback((draft) => {
     setActors(prev => [...prev, { ...draft, id: "a" + (Date.now()) + Math.floor(Math.random()*1000) }]);
@@ -1162,12 +1184,18 @@ function App() {
   };
 
   const exportJSON = () => {
-    const payload = { org, actors, exportedAt: new Date().toISOString() };
+    const payload = {
+      snapshotDate,
+      filledOutBy: filledOutBy || null,
+      org,
+      actors,
+      exportedAt: new Date().toISOString(),
+    };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `power-map-${(org.orgName || "untitled").toLowerCase().replace(/[^a-z0-9]+/g,"-")}.json`;
+    a.download = `power-map-${snapshotDate}-${(org.orgName || "untitled").toLowerCase().replace(/[^a-z0-9]+/g,"-")}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1178,12 +1206,41 @@ function App() {
     <div className="app">
       <header className="topbar">
         <div className="title-block">
-          <span className="wordmark">Power Mapping Instrument</span>
+          <span className="wordmark">Power Mapping</span>
+          <span style={{display:"block", fontSize:11, color:"var(--mute)", marginTop:2, letterSpacing:".02em"}}>
+            Snapshot of where actors stand today. The grid will change over time.
+          </span>
         </div>
         <div style={{display:"flex", alignItems:"center", gap:14}}>
-          <span className="badge">Demo · data not saved</span>
+          <div style={{display:"flex", alignItems:"center", gap:8}}>
+            <label style={{fontSize:11, color:"var(--mute)", textTransform:"uppercase", letterSpacing:".08em", fontWeight:600}}>Filled out by</label>
+            <input
+              type="text"
+              value={filledOutBy}
+              onChange={(e) => setFilledOutBy(e.target.value)}
+              placeholder="Your name"
+              style={{
+                fontFamily:"var(--sans)", fontSize:13, padding:"5px 8px",
+                border:"1px solid var(--rule)", borderRadius:6, background:"var(--paper)",
+                color:"var(--ink)", minWidth:140,
+              }}
+            />
+          </div>
+          <div style={{display:"flex", alignItems:"center", gap:8}}>
+            <label style={{fontSize:11, color:"var(--mute)", textTransform:"uppercase", letterSpacing:".08em", fontWeight:600}}>Date</label>
+            <input
+              type="date"
+              value={snapshotDate}
+              onChange={(e) => setSnapshotDate(e.target.value)}
+              style={{
+                fontFamily:"var(--sans)", fontSize:13, padding:"5px 8px",
+                border:"1px solid var(--rule)", borderRadius:6, background:"var(--paper)",
+                color:"var(--ink)",
+              }}
+            />
+          </div>
           <div className="top-actions">
-            <button className="btn btn-ghost" onClick={exportJSON}>Export JSON</button>
+            <button className="btn btn-ghost" onClick={exportJSON}>Export</button>
             <button className="btn btn-ghost" onClick={reset}>Reset</button>
           </div>
         </div>
@@ -1264,8 +1321,8 @@ function App() {
 
         <main className="right-pane">
           <div className="tabs">
-            <button className={"tab" + (view === "network" ? " active" : "")} onClick={() => setView("network")}>Network</button>
             <button className={"tab" + (view === "grid" ? " active" : "")} onClick={() => setView("grid")}>Power grid</button>
+            <button className={"tab" + (view === "network" ? " active" : "")} onClick={() => setView("network")}>Network</button>
           </div>
           <div className="view-host">
             {view === "network"
