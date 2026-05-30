@@ -362,12 +362,13 @@
   }
   .grid-svg { max-width: 100%; max-height: 100%; cursor: default; }
   .grid-quad-label {
-    font-family: var(--mono); font-size: 11px; font-weight: 600;
-    letter-spacing: 0.14em; text-transform: uppercase; fill: var(--cobalt);
+    font-family: var(--mono); font-size: 9px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase; fill: #a1a1aa;
+    opacity: 0.7;
   }
   .grid-quad-strategy {
-    font-family: var(--display); font-size: 15px; font-weight: 600;
-    fill: var(--ink); letter-spacing: -0.005em;
+    font-family: var(--sans); font-size: 11px; font-weight: 400;
+    fill: #a1a1aa; letter-spacing: 0; opacity: 0.85;
   }
   .grid-axis-label {
     font-family: var(--mono); font-size: 10px; font-weight: 500;
@@ -1230,12 +1231,12 @@ function PowerGrid({ actors, onUpdateActor }) {
     };
   }, [dragId, size.w, size.h, onUpdateActor]);
 
-  // Quadrant labels
+  // Quadrant labels — anchored to corners, muted so they don't compete with the dots.
   const quads = [
-    { num: "3", strategy: "Engage & redirect",        sx: cx + half * 0.5, sy: cy - half * 0.93 },
-    { num: "2", strategy: "Divide & neutralize",      sx: cx - half * 0.5, sy: cy - half * 0.93 },
-    { num: "1", strategy: "Organize a base",          sx: cx + half * 0.5, sy: cy + half * 0.93 },
-    { num: "4", strategy: "Disorganize / reorganize", sx: cx - half * 0.5, sy: cy + half * 0.93 },
+    { num: "3", strategy: "Engage & redirect",        sx: cx + half - 8, sy: cy - half + 14, anchor: "end"   },
+    { num: "2", strategy: "Divide & neutralize",      sx: cx - half + 8, sy: cy - half + 14, anchor: "start" },
+    { num: "1", strategy: "Organize a base",          sx: cx + half - 8, sy: cy + half - 6,  anchor: "end"   },
+    { num: "4", strategy: "Disorganize / reorganize", sx: cx - half + 8, sy: cy + half - 6,  anchor: "start" },
   ];
 
   return (
@@ -1301,11 +1302,11 @@ function PowerGrid({ actors, onUpdateActor }) {
           Supporter (+5)
         </text>
 
-        {/* quadrant strategy labels */}
+        {/* quadrant strategy labels — muted, corner-anchored */}
         {quads.map((q, i) => (
           <g key={i}>
-            <text className="grid-quad-label" x={q.sx} y={q.sy} textAnchor="middle">{q.num}</text>
-            <text className="grid-quad-strategy" x={q.sx} y={q.sy + 16} textAnchor="middle">{q.strategy}</text>
+            <text className="grid-quad-label" x={q.sx} y={q.sy} textAnchor={q.anchor}>{q.num}</text>
+            <text className="grid-quad-strategy" x={q.sx} y={q.sy + 12} textAnchor={q.anchor}>{q.strategy}</text>
           </g>
         ))}
 
