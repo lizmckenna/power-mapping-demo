@@ -457,6 +457,40 @@
 <script type="text/babel">
 const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
+/* ========= Supabase persistence config =========
+   The public anon key and project URL for the Groundwork Supabase project.
+   These are safe to embed in client-side code (Supabase's standard pattern);
+   RLS policy `anon insert power_map_snapshots` restricts what anonymous
+   submissions can do (only INSERT demo rows, never read or update). */
+const SUPABASE_URL      = "REPLACE_WITH_GW_SUPABASE_URL";   // e.g. https://abcdefg.supabase.co
+const SUPABASE_ANON_KEY = "REPLACE_WITH_GW_SUPABASE_ANON_KEY";
+const PERSIST_ENABLED   = !SUPABASE_URL.startsWith("REPLACE") && !SUPABASE_ANON_KEY.startsWith("REPLACE");
+
+async function saveSnapshotToSupabase({ snapshotDate, filledOutBy, orgName, payload }) {
+  if (!PERSIST_ENABLED) throw new Error("Supabase not configured. Set SUPABASE_URL + SUPABASE_ANON_KEY at the top of this file.");
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/power_map_snapshots`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_ANON_KEY,
+      "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+      "Prefer": "return=representation",
+    },
+    body: JSON.stringify({
+      snapshot_date: snapshotDate,
+      filled_out_by: filledOutBy || null,
+      org_name: orgName || null,
+      source: "demo",
+      payload,
+    }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Supabase ${res.status}: ${text}`);
+  }
+  return await res.json();
+}
+
 /* ========= Static config ========= */
 
 // Integer grid scale: -5 to +5 on both axes, whole numbers only.
@@ -1375,6 +1409,32 @@ function App() {
   const today = new Date().toISOString().slice(0, 10);
   const [snapshotDate, setSnapshotDate] = useState(today);
   const [filledOutBy, setFilledOutBy] = useState("");
+  // Save-to-Supabase state
+  const [saveState, setSaveState] = useState("idle"); // idle | saving | saved | error
+  const [saveMsg, setSaveMsg]     = useState("");
+  const saveSnapshot = async () => {
+    if (!actors.length) {
+      setSaveState("error");
+      setSaveMsg("Add at least one actor before saving.");
+      return;
+    }
+    setSaveState("saving");
+    setSaveMsg("");
+    try {
+      await saveSnapshotToSupabase({
+        snapshotDate,
+        filledOutBy,
+        orgName: org.orgName,
+        payload: { org, actors, exportedAt: new Date().toISOString() },
+      });
+      setSaveState("saved");
+      setSaveMsg("Saved.");
+      setTimeout(() => setSaveState("idle"), 3500);
+    } catch (e) {
+      setSaveState("error");
+      setSaveMsg(e.message || "Save failed.");
+    }
+  };
 
   const addActor = useCallback((draft) => {
     setActors(prev => [...prev, { ...draft, id: "a" + (Date.now()) + Math.floor(Math.random()*1000) }]);
@@ -1447,7 +1507,25 @@ function App() {
               }}
             />
           </div>
-          <div className="top-actions">
+          <div className="top-actions" style={{alignItems:"center"}}>
+            {saveState === "saved" && (
+              <span style={{fontFamily:"var(--sans)", fontSize:11.5, color:"#15803d", padding:"4px 10px", background:"#dcfce7", border:"1px solid rgba(34,197,94,0.35)", borderRadius:6}}>
+                ✓ {saveMsg}
+              </span>
+            )}
+            {saveState === "error" && (
+              <span style={{fontFamily:"var(--sans)", fontSize:11.5, color:"#b91c1c", padding:"4px 10px", background:"#fee2e2", border:"1px solid rgba(239,68,68,0.35)", borderRadius:6, maxWidth:280, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}} title={saveMsg}>
+                {saveMsg}
+              </span>
+            )}
+            <button
+              className="btn btn-primary"
+              onClick={saveSnapshot}
+              disabled={saveState === "saving" || !PERSIST_ENABLED}
+              title={PERSIST_ENABLED ? "Save this snapshot to the Groundwork backend" : "Backend not configured (see SUPABASE_URL in source)"}
+            >
+              {saveState === "saving" ? "Saving…" : "Save snapshot"}
+            </button>
             <button className="btn btn-ghost" onClick={exportJSON}>Export</button>
             <button className="btn btn-ghost" onClick={reset}>Reset</button>
           </div>
