@@ -185,6 +185,57 @@
   }
   .face-row-wrap { display: flex; flex-direction: column; }
 
+  /* 11-point rating selector */
+  .rating-track {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 4px 0 8px;
+    background: var(--paper);
+  }
+  .rating-cell {
+    flex: 1; min-width: 0; height: 34px;
+    border: none; padding: 0;
+    background: var(--paper);
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    color: var(--ink-2); cursor: pointer;
+    border-right: 1px solid var(--rule);
+    transition: background 0.12s, color 0.12s;
+  }
+  .rating-cell:last-child { border-right: none; }
+  .rating-cell.zero-divider { border-right: 2px solid var(--mute); }
+  .rating-cell:hover { background: var(--cream-2); }
+  .rating-cell.ally:hover { background: rgba(19,48,107,0.10); color: var(--cobalt); }
+  .rating-cell.opp:hover  { background: rgba(183,67,43,0.10); color: var(--terracotta); }
+  .rating-cell.selected.ally    { background: var(--cobalt); color: var(--paper); }
+  .rating-cell.selected.opp     { background: var(--terracotta); color: var(--paper); }
+  .rating-cell.selected.neutral { background: var(--ink); color: var(--paper); }
+
+  .rating-readout {
+    padding: 9px 11px;
+    border: 1px solid var(--rule);
+    border-left-width: 3px;
+    border-radius: 3px;
+    background: var(--paper);
+    margin-bottom: 4px;
+  }
+  .rating-readout.ally    { border-left-color: var(--cobalt); }
+  .rating-readout.opp     { border-left-color: var(--terracotta); }
+  .rating-readout.neutral { border-left-color: var(--mute); }
+  .rating-readout-head { display: flex; align-items: baseline; gap: 8px; }
+  .rating-readout-num {
+    font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink-2);
+  }
+  .rating-readout-label {
+    font-family: var(--sans); font-weight: 500; font-size: 13.5px; color: var(--ink);
+  }
+  .rating-readout-desc {
+    font-family: var(--sans); font-weight: 300; font-size: 12.5px; line-height: 1.5;
+    color: var(--ink); margin-top: 4px;
+  }
+
   /* Buttons */
   .btn {
     font-family: var(--mono); font-size: 10px; font-weight: 500;
@@ -562,43 +613,37 @@ const CONSTITUENCY = [
   { value: "mass",       label: "Mass constituency",   radius: 26 },
 ];
 
-const FACES = [
-  {
-    value: 0,
-    label: "No relationship",
-    desc: "You don't know this person in a power-building context, or you only know them socially or professionally."
-  },
-  {
-    value: 1,
-    label: "Shared policy interest or campaign",
-    desc: "Engaging around specific policy, programmatic, or campaign goals. Working to determine the outcome of a contested decision."
-  },
-  {
-    value: 2,
-    label: "Agenda-setting",
-    desc: "Shaping which issues and solutions are on the agenda, who has a seat at the table, and how decisions get made."
-  },
-  {
-    value: 3,
-    label: "Co-conspirator (values, ideology)",
-    desc: "Reshaping how issues, constituencies, and solutions are understood. Shifting narratives about what is just, legitimate, and possible."
-  }
+// 11-point power-actor scale. Sign = ally/opponent, magnitude = depth of relationship.
+const RATINGS = [
+  { value:  5, label: "Co-conspirator",             short: "Co-conspirator",    desc: "Shared values and ideology. Sustained narrative-level collaboration across multiple cycles." },
+  { value:  4, label: "Agenda partner",             short: "Agenda partner",    desc: "Strategy together. Helps put your issues on external agendas; raises your priorities in venues where you aren't present." },
+  { value:  3, label: "Reliable decision ally",     short: "Reliable ally",     desc: "Consistently with you on concrete policy or budget asks over the past 24 months." },
+  { value:  2, label: "Tactical decision ally",     short: "Tactical ally",     desc: "Has supported at least one specific ask in the last 12 months when politics aligned. Not reliable across asks." },
+  { value:  1, label: "Friendly contact",           short: "Friendly contact",  desc: "Warm but no real engagement. Knows your work; no recent collaboration." },
+  { value:  0, label: "No relationship",            short: "No relationship",   desc: "You may not know this person, or know them only socially or professionally — not in the context of building or contesting power." },
+  { value: -1, label: "Distant or cold",            short: "Distant",           desc: "They don't engage. May not understand your work. Not actively opposing." },
+  { value: -2, label: "Tactical opponent",          short: "Tactical opponent", desc: "Has opposed at least one specific ask in the last 12 months when politics aligned with their interests." },
+  { value: -3, label: "Reliable decision opponent", short: "Reliable opponent", desc: "Consistently against your concrete asks over the past 24 months." },
+  { value: -4, label: "Agenda-level opponent",      short: "Agenda opponent",   desc: "Works to keep your issues off the agenda. Has worked to deny you a seat at the table or redirect public attention." },
+  { value: -5, label: "Values-level adversary",     short: "Adversary",         desc: "Actively works to discredit your worldview, leaders, or movement. Engaged in narrative campaigns against your base." }
 ];
 
-const EDGE_STYLE = {
-  0: null,
-  1: { stroke: "#171514", width: 1.2, dash: "3 4", opacity: 1 },
-  2: { stroke: "#171514", width: 2.8, dash: null,  opacity: 1 },
-  3: { stroke: "#171514", width: 5.5, dash: null,  opacity: 1 },
-};
+// Edge style from rating: cobalt gradient for allies, terracotta gradient for opponents.
+// Magnitude controls thickness. 0 = no edge.
+function edgeStyleFor(r) {
+  const m = Math.abs(r | 0);
+  if (m === 0) return null;
+  const allyColors = ["#7e94c2", "#4a6396", "#2a4781", "#13306b", "#0a204e"];   // +1..+5
+  const oppColors  = ["#d8a496", "#c47659", "#b7432b", "#9a3823", "#7d2c1a"];   // -1..-5
+  const stroke = (r > 0 ? allyColors : oppColors)[m - 1];
+  const dash = m === 1 ? "5 4" : null;
+  const width = 0.9 + (m - 1) * 0.9;  // 0.9, 1.8, 2.7, 3.6, 4.5
+  return { stroke, width, dash, opacity: 0.95 };
+}
 
 const lookupType = v => ACTOR_TYPES.find(t => t.value === v) || ACTOR_TYPES[0];
 const lookupConst = v => CONSTITUENCY.find(c => c.value === v) || CONSTITUENCY[1];
-const highestFace = faces => {
-  if (!faces || faces.length === 0) return 0;
-  if (faces.includes(0) && faces.length === 1) return 0;
-  return Math.max(...faces.filter(f => f > 0));
-};
+const lookupRating = v => RATINGS.find(r => r.value === (v | 0)) || RATINGS.find(r => r.value === 0);
 
 /* ========= Seed data ========= */
 
@@ -616,7 +661,6 @@ const seedActors = () => ([
     organization: "State Legislature",
     actorType: "elected",
     constituency: "mass",
-    faces: [1, 2],
     whyMatter: "Lead sponsor on the housing trust fund bill; key swing vote on budget.",
     notes: "Regular strategy calls during session. Co-developed last year's amendment package.",
     scoreRationale: "Carried our housing bill through committee last cycle.",
@@ -629,7 +673,6 @@ const seedActors = () => ([
     organization: "State Dept. of Economic Development",
     actorType: "gov_staff",
     constituency: "organized",
-    faces: [1],
     whyMatter: "Controls implementation of the workforce equity rule we won in 2024.",
     notes: "Quarterly check-ins. Relationship is transactional but reliable.",
     scoreRationale: "Quietly enforced our rule's intent against pushback from industry.",
@@ -642,7 +685,6 @@ const seedActors = () => ([
     organization: "Faith United Coalition",
     actorType: "base_org",
     constituency: "mass",
-    faces: [1, 2, 3],
     whyMatter: "Anchor partner for the moral economy frame and door-to-door capacity.",
     notes: "Deepest peer alliance. Joint canvasses, shared narrative work, co-led last cycle's listening campaign.",
     scoreRationale: "Turned out 1,200 congregants for the budget hearing.",
@@ -655,7 +697,6 @@ const seedActors = () => ([
     organization: "Statewide Advocacy Network",
     actorType: "advocacy",
     constituency: "organized",
-    faces: [2, 3],
     whyMatter: "Convenes the statewide coalition table; controls comms war room.",
     notes: "Strategic alignment is strong. Less involved in our direct base work.",
     scoreRationale: "Runs the coalition messaging that frames every legislative fight.",
@@ -668,7 +709,6 @@ const seedActors = () => ([
     organization: "(Solo)",
     actorType: "operative",
     constituency: "individual",
-    faces: [2],
     whyMatter: "Connects us to caucus leadership; reads the legislative weather.",
     notes: "Informal, ad-hoc. Useful for intel and access, not for strategy.",
     scoreRationale: "Brokered our first sit-down with the Speaker's chief of staff.",
@@ -681,7 +721,6 @@ const seedActors = () => ([
     organization: "State Senate",
     actorType: "elected",
     constituency: "mass",
-    faces: [1],
     whyMatter: "Chairs the committee where our budget asks live. Holds them up every cycle.",
     notes: "Hostile but reachable. Met twice last year, formal and transactional.",
     scoreRationale: "Kept our line item out of last three budgets without explanation.",
@@ -689,7 +728,46 @@ const seedActors = () => ([
   }
 ]);
 
-/* ========= Faces multi-select ========= */
+/* ========= 11-point rating panel ========= */
+
+function RatingPanel({ value, onChange }) {
+  const r = lookupRating(value);
+  const sign = r.value > 0 ? "ally" : r.value < 0 ? "opp" : "neutral";
+  const ordered = RATINGS.slice().sort((a, b) => a.value - b.value);
+  return (
+    <div>
+      <div className="rating-track" role="radiogroup" aria-label="Power actor rating">
+        {ordered.map(opt => {
+          const selected = opt.value === r.value;
+          const optSign = opt.value > 0 ? "ally" : opt.value < 0 ? "opp" : "neutral";
+          const display = opt.value === 0 ? "0" : (opt.value > 0 ? "+" + opt.value : "" + opt.value);
+          const cls = "rating-cell " + optSign
+            + (selected ? " selected" : "")
+            + (opt.value === 0 ? " zero-divider" : "");
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              className={cls}
+              onClick={() => onChange(opt.value)}
+              aria-pressed={selected}
+              title={opt.label + " — " + opt.desc}
+            >{display}</button>
+          );
+        })}
+      </div>
+      <div className={"rating-readout " + sign}>
+        <div className="rating-readout-head">
+          <span className="rating-readout-num">{r.value === 0 ? "0" : (r.value > 0 ? "+" + r.value : "" + r.value)}</span>
+          <span className="rating-readout-label">{r.label}</span>
+        </div>
+        <div className="rating-readout-desc">{r.desc}</div>
+      </div>
+    </div>
+  );
+}
+
+/* ========= Faces multi-select (legacy, unused) ========= */
 
 function FaceSelect({ value, onChange }) {
   const [expanded, setExpanded] = useState(null); // which face's definition is open
@@ -819,7 +897,7 @@ function ActorForm({ initial, onCommit, onCancel, submitLabel }) {
   const blank = {
     name: "", title: "", organization: "",
     actorType: "elected", constituency: "organized",
-    faces: [], whyMatter: "", notes: "",
+    whyMatter: "", notes: "",
     scoreRationale: "", // why this grid position? concrete behavior expected
     gridX: 0, gridY: 0
   };
@@ -879,14 +957,24 @@ function ActorForm({ initial, onCommit, onCancel, submitLabel }) {
           onChange={(nx, ny) => setDraft(d => ({ ...d, gridX: nx, gridY: ny }))}
         />
       </div>
+      <div className="field">
+        <label>
+          Relationship rating
+          <span style={{fontWeight:400, color:"var(--mute)", marginLeft:6, fontSize:11, textTransform:"none", letterSpacing:0}}>11-point scale from opponent (−5) to co-conspirator (+5).</span>
+        </label>
+        <RatingPanel
+          value={draft.gridX | 0}
+          onChange={(v) => setDraft(d => ({ ...d, gridX: v }))}
+        />
+      </div>
       {(() => {
         const pa = anchorFor(POWER_ANCHORS, clampGrid(draft.gridY ?? 0));
         return (
           <div className="field">
             <label>
-              Why this score? Give one concrete example.
+              Behavioral example (required)
               <span style={{fontWeight:400, color:"var(--mute)", display:"block", marginTop:4, fontSize:11.5, textTransform:"none", letterSpacing:0, lineHeight:1.4}}>
-                Power anchor: <strong style={{color:"var(--ink-2)", fontWeight:600}}>{pa.bold}</strong>{pa.body ? ", " + pa.body : ""}.
+                Concrete thing this actor did that justifies the rating. Power anchor: <strong style={{color:"var(--ink-2)", fontWeight:600}}>{pa.bold}</strong>{pa.body ? ", " + pa.body : ""}.
               </span>
             </label>
             <input
@@ -898,13 +986,6 @@ function ActorForm({ initial, onCommit, onCancel, submitLabel }) {
           </div>
         );
       })()}
-      <div className="field">
-        <label>
-          Faces of power engaged
-          <span style={{fontWeight:400, color:"var(--mute)", marginLeft:6, fontSize:11, textTransform:"none", letterSpacing:0}}>Hover for definitions. Select one or more.</span>
-        </label>
-        <FaceSelect value={draft.faces} onChange={v => set("faces", v)} />
-      </div>
       <div className="field">
         <label>Why this actor matters</label>
         <textarea value={draft.whyMatter} onChange={e => set("whyMatter", e.target.value)} placeholder="What role do they play in your power landscape?" />
@@ -931,10 +1012,8 @@ function ActorForm({ initial, onCommit, onCancel, submitLabel }) {
 function ActorCard({ actor, onUpdate, onDelete }) {
   const [editing, setEditing] = useState(false);
   const t = lookupType(actor.actorType);
-  const hf = highestFace(actor.faces);
-  const facesStr = (!actor.faces || actor.faces.length === 0) ? "Faces unset" :
-                   actor.faces.includes(0) ? "Face 0" :
-                   "Faces " + actor.faces.join(", ");
+  const r = lookupRating(actor.gridX);
+  const ratingStr = (r.value === 0 ? "0" : (r.value > 0 ? "+" + r.value : "" + r.value)) + "  " + r.short;
   return (
     <div className={"actor-card" + (editing ? " editing" : "")}>
       <div className="actor-card-head">
@@ -944,7 +1023,7 @@ function ActorCard({ actor, onUpdate, onDelete }) {
           <div className="actor-meta">
             {[actor.title, actor.organization].filter(Boolean).join(" · ") || <span style={{fontStyle:"italic"}}>no title / org</span>}
           </div>
-          <div className={"actor-faces" + (hf === 0 ? " zero" : "")}>{facesStr} · {t.label} · {lookupConst(actor.constituency).label}</div>
+          <div className={"actor-faces" + (r.value === 0 ? " zero" : "")}>{ratingStr} · {t.label} · {lookupConst(actor.constituency).label}</div>
         </div>
         <div className="actor-actions">
           <button className="icon-btn" onClick={() => setEditing(e => !e)}>{editing ? "Close" : "Edit"}</button>
@@ -997,13 +1076,14 @@ function NetworkMap({ org, actors }) {
       ...actors.map(a => {
         const t = lookupType(a.actorType);
         const c = lookupConst(a.constituency);
-        const hf = highestFace(a.faces);
+        const rating = a.gridX | 0;
         return {
           id: a.id,
           actor: a,
           color: t.color,
           r: c.radius,
-          highestFace: hf,
+          rating: rating,
+          ratingMag: Math.abs(rating),
         };
       })
     ];
@@ -1028,13 +1108,15 @@ function NetworkMap({ org, actors }) {
     });
 
     // Links: ego → each actor, only if face > 0 (face 0 = isolated, no edge)
+    // Edges only for actors with nonzero rating (0 = isolated, no line)
     const links = nodes
-      .filter(n => !n.isEgo && n.highestFace > 0)
+      .filter(n => !n.isEgo && n.ratingMag > 0)
       .map(n => ({
         source: "__ego__",
         target: n.id,
-        face: n.highestFace,
-        distance: 110 + (4 - n.highestFace) * 35
+        rating: n.rating,
+        ratingMag: n.ratingMag,
+        distance: 110 + (5 - n.ratingMag) * 22
       }));
 
     nodesRef.current = nodes;
@@ -1064,10 +1146,10 @@ function NetworkMap({ org, actors }) {
     linkSel.exit().remove();
     const linkEnter = linkSel.enter().append("line").attr("class", "edge");
     const linkAll = linkEnter.merge(linkSel)
-      .attr("stroke", d => EDGE_STYLE[d.face].stroke)
-      .attr("stroke-width", d => EDGE_STYLE[d.face].width)
-      .attr("stroke-dasharray", d => EDGE_STYLE[d.face].dash || "")
-      .attr("opacity", d => EDGE_STYLE[d.face].opacity);
+      .attr("stroke", d => (edgeStyleFor(d.rating) || {}).stroke || "transparent")
+      .attr("stroke-width", d => (edgeStyleFor(d.rating) || {}).width || 0)
+      .attr("stroke-dasharray", d => (edgeStyleFor(d.rating) || {}).dash || "")
+      .attr("opacity", d => (edgeStyleFor(d.rating) || {}).opacity || 0);
 
     const nodeGroup = svg.select(".nodes").selectAll("g.node")
       .data(nodes, d => d.id);
@@ -1159,17 +1241,16 @@ function NetworkMap({ org, actors }) {
             <span>{c.label}</span>
           </div>
         ))}
-        <h3>Highest face of power</h3>
+        <h3>Relationship rating</h3>
         <div style={{fontSize:11, fontStyle:"italic", color:"var(--mute)", lineHeight:1.4, marginBottom:6}}>
-          If an actor is engaged across multiple faces, the edge shows the highest.
+          Sign = ally vs. opponent. Magnitude = depth. No line = no relationship.
         </div>
-        {[3, 2, 1, 0].map(f => {
-          const s = EDGE_STYLE[f];
-          const label = f === 0 ? "No relationship (isolated)"
-                      : f === 1 ? "Shared policy interest / campaign"
-                      : f === 2 ? "Agenda-setting" : "Co-conspirator (values / ideology)";
+        {[5, 3, 1, 0, -1, -3, -5].map(rv => {
+          const s = edgeStyleFor(rv);
+          const lab = lookupRating(rv);
+          const numTxt = rv === 0 ? "0" : (rv > 0 ? "+" + rv : "" + rv);
           return (
-            <div className="item" key={f}>
+            <div className="item" key={rv}>
               <svg className="edge-swatch" width="28" height="10">
                 {s ? (
                   <line x1="0" y1="5" x2="28" y2="5"
@@ -1178,29 +1259,33 @@ function NetworkMap({ org, actors }) {
                     opacity={s.opacity}/>
                 ) : null}
               </svg>
-              <span>{label}</span>
+              <span><span style={{fontFamily:"var(--mono)", fontWeight:500, color:"var(--ink-2)", marginRight:6}}>{numTxt}</span>{lab.short}</span>
             </div>
           );
         })}
       </div>
 
-      {tip && tip.actor && (
-        <div className="map-tooltip" style={{
-          left: Math.min(tip.x + 14, size.w - 270),
-          top: Math.min(tip.y + 14, size.h - 120)
-        }}>
-          <div className="tt-name">{tip.actor.name}</div>
-          <div className="tt-meta">
-            {[tip.actor.title, tip.actor.organization].filter(Boolean).join(" · ")}
+      {tip && tip.actor && (() => {
+        const rv = tip.actor.gridX | 0;
+        const r = lookupRating(rv);
+        const numTxt = rv === 0 ? "0" : (rv > 0 ? "+" + rv : "" + rv);
+        return (
+          <div className="map-tooltip" style={{
+            left: Math.min(tip.x + 14, size.w - 270),
+            top: Math.min(tip.y + 14, size.h - 120)
+          }}>
+            <div className="tt-name">{tip.actor.name}</div>
+            <div className="tt-meta">
+              {[tip.actor.title, tip.actor.organization].filter(Boolean).join(" · ")}
+            </div>
+            <div className="tt-meta">{lookupType(tip.actor.actorType).label} · {lookupConst(tip.actor.constituency).label}</div>
+            <div className="tt-faces">{numTxt} · {r.label}</div>
+            {tip.actor.scoreRationale && (
+              <div className="tt-meta" style={{marginTop:6, fontStyle:"italic"}}>{tip.actor.scoreRationale}</div>
+            )}
           </div>
-          <div className="tt-meta">{lookupType(tip.actor.actorType).label} · {lookupConst(tip.actor.constituency).label}</div>
-          <div className="tt-faces">
-            {tip.actor.faces && tip.actor.faces.length
-              ? (tip.actor.faces.includes(0) ? "Face 0: no power relationship" : "Faces " + tip.actor.faces.join(", "))
-              : "Faces unset"}
-          </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
